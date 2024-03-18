@@ -1,0 +1,17 @@
+<div style="width: 70%; margin: auto; margin-top: 20px; border: 2px solid rgb(242, 143, 1);">
+    <div class="tab">
+        <button id="BTNCLIENT" class="tablinks active" (click)="openMenu($event, 'CLIENT')">CLIENT</button>
+        <button id="BTNSITE" class="tablinks" (click)="openMenu($event, 'SITE')" [disabled]="entID == null ||entID == '' || statusEnt== 'provisioning'|| disbaledSite">SITE</button>
+        <button id="BTNCOMMANDES" class="tablinks" (click)="openMenu($event, 'COMMANDES')" [disabled]="entID == null || entID == '' || statusEnt== 'provisioning'">COMMANDES</button>
+    </div>
+    <div id="CLIENT" class="tabcontent" style="display: block; padding: 15px;">
+        <app-client [code_client]="code_client" [userid]="userid" (SendPackges)="SendPackges($event)"  (SendEntID)="SendEntID($event)" (SendOrgId)="SendOrgId($event)" (approvisionnement)="sendApprovisionnement($event)" (SendStatusEnt)="SendStatusEnt($event)"></app-client>
+    </div>
+    <div id="SITE" class="tabcontent" style=" padding: 15px;">
+        <app-sites [entID]="entID" [userid]="userid" [orgId]="orgId"  [packages]="packages" [approvisionnement]="approvisionnement" [statusEnt]="statusEnt"></app-sites>
+    </div>
+    <div id="COMMANDES" class="tabcontent" style=" padding: 15px;">
+        <app-commandes [entID]="entID" [userid]="userid" [orgId]="orgId" [packages]="packages" [approvisionnement]="approvisionnement" [statusEnt]="statusEnt"></app-commandes>
+    </div>
+</div>
+

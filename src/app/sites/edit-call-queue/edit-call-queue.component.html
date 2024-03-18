@@ -1,0 +1,1263 @@
+<div class="modal-header">
+    <h5 class="modal-title">Modifier call queue</h5>
+    <button type="button" (click)="close()" class="close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="registerCallQueueForm" (ngSubmit)="onUpdateCallQueue()" *ngIf="registerCallQueueForm">
+      <div class="col-md-12" style="margin: 15px 0 15px 0; padding: 0; ">
+        <div id="accordionEmplacement" class="accordion">
+          <div class="card">
+            <div class="card-header">
+              <span class="Title">
+                <i class="glyphicon glyphicon-hdd"></i>
+                Bases
+              </span>
+            </div>
+            <div id="collapseEmplacement" class="collapse show" data-parent="#accordionEmplacement">
+              <div class="card-body">
+                <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                  <div class="col-lg-12">
+                    <span class="input-group-addon">
+                      File d’attente d’appel Nom (*) <br/>
+                      Ce nom est utilisé ultérieurement pour identifier le File d’attente des appels.
+                    </span>
+                    <div class="form-line">
+                      <input type="text" [ngClass]="{'is-invalid': submitted && f['tb_NameCallQueue'].errors }"
+                       formControlName="tb_NameCallQueue" class="form-control">
+                      <div *ngIf="submitted && f['tb_NameCallQueue'].errors" class="invalid-feedback">
+                        <div *ngIf="f['tb_NameCallQueue'].errors['required']">
+                          Il faut saisir le nom de call park.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+             
+            </div>
+            <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+              <div class="col-md-5" style="padding-bottom:0;">
+                  <div class="input-group-tous">
+                    <span class="input-group-addon">
+                        Numéro de téléphone
+                    </span>
+                    <div class="form-line">
+                        <ng-select 
+                        formControlName="tb_PhoneNumber" [searchFn]="startsWithSearchFn" (change)="setExtensionOblige($event)">
+                        <ng-option value="">Aucun</ng-option>
+                        <ng-option *ngFor="let num of numbersPhone"
+                          [value]="num['phoneNumber']">{{num['phoneNumber']}}</ng-option>
+                      </ng-select> 
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-2" style="padding-bottom:0;">
+                    <div class="input-group-tous">
+                      <span class="input-group-addon">
+                         
+                      </span>
+                      <div class="form-line">
+                        <span>et/ou</span>
+                       
+                      </div>
+                    
+                    </div>
+                  </div>
+                <div class="col-md-5" style="padding-bottom:0;">
+                  <div class="input-group-tous">
+                    <span class="input-group-addon">
+                       Extension <span *ngIf="obligatoireExtension">(*)</span>
+                    </span>
+                    <div class="form-line">
+                      <input formControlName="tb_extension" [ngClass]="{'is-invalid': submitted && f['tb_extension'].errors }"
+                        class="form-control" type="text" (keypress)="extensionControl($event)" placeholder="Saisissez un numéro de deux à six chiffres">
+                        <div *ngIf="submitted && f['tb_extension'].errors" class="invalid-feedback">
+                          <div *ngIf="f['tb_extension'].errors['minlength']">La longueur ne peut pas être inférieure à 2
+                          </div>
+                          <div *ngIf="f['tb_extension'].errors['maxlength']">La longueur ne peut pas être supérieure à 6
+                          </div>
+                          <div *ngIf="f['tb_extension'].errors['pattern']">Doit saisir des chiffres
+                          </div>
+                          <div *ngIf="f['tb_extension'].errors['required']">
+                            Il faut saisir l'extension car le champ <b>numéro de téléphone</b>  est vide
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+                </div>
+         
+        </div>
+        <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+          <div class="col-lg-12">
+            <span class="input-group-addon">
+              Autoriser le numéro de téléphone de la file d’attente pour les appels sortants
+      
+            </span>
+            <div class="form-check form-switch">
+              <input style="cursor: pointer;" class="form-check-input" type="checkbox" formControlName="tb_phoneNumberForOutgoingCallsEnabled" id="checkPhone">
+              <label class="form-check-label" for="checkPhone"></label>
+            </div>
+          </div>
+      
+      </div>
+      <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+          <div class="col-lg-3">
+            <span class="input-group-addon">
+              Nombre d’appels en file d’attente
+      
+            </span>
+            <div class="form-line">
+             
+                  <input type="number" [ngClass]="{'is-invalid': submitted && f['tb_queueSize'].errors }" class="form-control" formControlName="tb_queueSize">
+                  <div *ngIf="submitted && f['tb_queueSize'].errors" class="invalid-feedback">
+                      <div *ngIf="f['tb_queueSize'].errors['required']">
+                        Il faut saisir le nom de call park.
+                      </div>
+                    </div>
+              <!--c'est un champ obligatroire le nombre doit etre entre 0 et 250 -->
+              
+              
+            </div>
+          </div>
+      
+      </div>
+      <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+        <div class="col-lg-12">
+          <span class="input-group-addon">
+         
+    
+          </span>
+<div class="form-line">
+<span>ID de l’appelant<br/>
+  L’ID de l’appelant est utilisé lorsque le renvoi d’appel est activé et que les appels sont renvoyés vers l’extérieur.
+  
+  Numéro de téléphone de l’ID de l’appelant externe</span>
+</div>
+        </div>
+    
+    </div>
+    <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+      <div class="col-lg-12">
+        <span class="input-group-addon">
+       
+  
+        </span>
+        <div class="form-line">
+          <div class="form-check" *ngIf="ligneDirect">
+            <input class="form-check-input" [checked]="callQueue.callingLineIdPolicy == 'DIRECT_LINE'" type="radio" value="DIRECT_LINE" id="callingLineIdPolicy1" (change)="getCallingLineIdPolicy($event)" formControlName="tb_callingLineIdPolicy">
+            <label class="form-check-label" for="callingLineIdPolicy1">Ligne directe: {{numberChoice}}</label>
+          </div>
+          <div class="form-check" *ngIf="numeroEmplacement">
+            <input class="form-check-input" [checked]="callQueue.callingLineIdPolicy == 'LOCATION_NUMBER'" type="radio" value="LOCATION_NUMBER" id="callingLineIdPolicy2" (change)="getCallingLineIdPolicy($event)" formControlName="tb_callingLineIdPolicy">
+            <label class="form-check-label" for="callingLineIdPolicy2">Numéro de l’emplacement: {{mainPhoneNumber.phoneNumber}}</label>
+          </div>
+          <div class="form-check" *ngIf="showLigneAttributeEmplacementViaCallQueu">
+            <input class="form-check-input" [checked]="callQueue.callingLineIdPolicy == 'CUSTOM'" type="radio" value="CUSTOM" id="callingLineIdPolicy3" (change)="getCallingLineIdPolicy($event)" formControlName="tb_callingLineIdPolicy">
+            <label class="form-check-label" for="callingLineIdPolicy3">Numéro attribué à partir de l’emplacement de File d’attente d’appel</label>
+          </div>
+          <ng-select  *ngIf="showCallingIdPhoneNumberByCallQueue" style="width: 20%;"
+          formControlName="tb_callingLineIdPhoneNumber" >
+          <ng-option *ngFor="let num of ligneAttributeEmplacementViaCallQueu"
+            [value]="num['phoneNumber']">{{num['phoneNumber']}}</ng-option>
+          </ng-select>
+        </div>
+      </div>
+    </div>
+      <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+          <div class="col-lg-6">
+            <span class="input-group-addon">
+              Prénom (*)
+      
+            </span>
+            <div class="form-line">
+             
+                  <input type="text" [ngClass]="{'is-invalid': submitted && f['tb_FirstName'].errors }" class="form-control" formControlName="tb_FirstName">
+                  <div *ngIf="submitted && f['tb_FirstName'].errors" class="invalid-feedback">
+                      <div *ngIf="f['tb_FirstName'].errors['required']">
+                          Le prénom de l’ID d’appelant de File d’attente d’appel doit être renseignés.
+                      </div>
+                    </div>
+              <!--c'est un champ obligatroire le nombre doit etre entre 0 et 250 -->
+              
+              
+            </div>
+          </div>
+          <div class="col-lg-6">
+              <span class="input-group-addon">
+                Nom (*)
+        
+              </span>
+              <div class="form-line">
+               
+                    <input type="text" [ngClass]="{'is-invalid': submitted && f['tb_LastName'].errors }" class="form-control" formControlName="tb_LastName">
+                    <div *ngIf="submitted && f['tb_LastName'].errors" class="invalid-feedback">
+                        <div *ngIf="f['tb_LastName'].errors['required']">
+                          Le nom de l’ID d’appelant de File d’attente d’appel doit être renseignés.
+                        </div>
+                      </div>
+                <!--c'est un champ obligatroire le nombre doit etre entre 0 et 250 -->
+                
+                
+              </div>
+            </div>
+      
+      </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12">
+        <div id="accordionEmplacement" class="accordion">
+          <div class="card">
+            <div class="card-header">
+              <span class="Title">
+                <i class="glyphicon glyphicon-hdd"></i>
+                Routage des appels
+              </span>
+            </div>
+            <div id="collapseEmplacement" class="collapse show" data-parent="#accordionEmplacement">
+              <div class="card-body">
+              
+                <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                  <div class="col-lg-12">
+                    <span class="input-group-addon">
+                      Type de routage d’appel <br/>
+                      Le type de routage d’appel peut être soit prioritaire, soit basé sur l’aptitude. Le modèle de routage détermine combien de téléphones sonnent lorsqu’un appel arrive dans votre file d’attente, et l’ordre dans lequel ces téléphones sonnent.
+              
+                    </span>
+                    <div class="form-line">
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" style="cursor: pointer;" value="PRIORITY_BASED" id="typeRout1" formControlName="tb_routingType" (change)="getRoutingType($event)" checked>
+                        <label class="form-check-label" style="cursor: pointer;" for="typeRout1">Basé sur la priorité</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input"  style="cursor: pointer;" type="radio" id="typeRout2" value="SKILL_BASED" formControlName="tb_routingType" (change)="getRoutingType($event)">
+                        <label class="form-check-label" style="cursor: pointer;" for="typeRout2">Basé sur l’aptitude</label>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+              <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                <div class="col-lg-12">
+                
+                  <div class="form-line">
+                    
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" style="cursor: pointer;" id="circulaire" type="radio" value="CIRCULAR" formControlName="tb_policy" (click)="pendrePolicy($event)">
+                      <label class="form-check-label" for="circulaire">Circulaire 
+                         <!-- <i class="fa fa-repeat" aria-hidden="true"></i> -->
+                        </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" style="cursor: pointer;" type="radio" id="hautEnBas"  value="REGULAR" formControlName="tb_policy" (click)="pendrePolicy($event)">
+                      <label class="form-check-label" style="cursor: pointer;" for="hautEnBas">Haut en bas 
+                        <!-- <i class="fa fa-list-ol" aria-hidden="true"></i> -->
+                      </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" style="cursor: pointer;" type="radio" id="longtemp"  value="UNIFORM" formControlName="tb_policy" (click)="pendrePolicy($event)">
+                      <label class="form-check-label" style="cursor: pointer;" for="longtemp">Le plus longtemps inactif
+                        <!-- <i class="fa fa-history" aria-hidden="true"></i> -->
+                      </label>
+                    </div>
+                    <div class="form-check form-check-inline" *ngIf="affichetype">
+                      <input class="form-check-input" style="cursor: pointer;" type="radio" id="pondere"  value="WEIGHTED" formControlName="tb_policy" (click)="pendrePolicy($event)">
+                      <label class="form-check-label" style="cursor: pointer;" for="pondere">Pondéré 
+                        <!-- <i class="fa fa-list-ol" aria-hidden="true"></i> -->
+                      </label>
+                    </div>
+                    <div class="form-check form-check-inline" *ngIf="affichetype">
+                      <input class="form-check-input" style="cursor: pointer;" type="radio" id="simultane"  value="SIMULTANEOUS" formControlName="tb_policy" (click)="pendrePolicy($event)">
+                      <label class="form-check-label" style="cursor: pointer;" for="simultane">Simultané 
+                        <!-- <i class="fa fa-list-ol" aria-hidden="true"></i> -->
+                      </label>
+                    </div>
+                    
+                    <!-- <i class="fa-light fa-rotate-right"></i> -->
+                  </div>
+                </div>
+            
+            </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div> 
+      <div class="col-md-12" style="margin: 15px 0 15px 0; padding: 0; ">
+        <div id="accordionEmplacement" class="accordion">
+          <div class="card">
+            <div class="card-header">
+              <span class="Title">
+                <i class="glyphicon glyphicon-hdd"></i>
+                Paramètres de dépassement
+              </span>
+            </div>
+            <div id="collapseEmplacement" class="collapse show" data-parent="#accordionEmplacement">
+              <div class="card-body">
+              
+                <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                  <div class="col-lg-12">
+                    <span class="input-group-addon">
+                      Paramètres de dépassement <br/>
+                      Pour les nouveaux appels lorsque la file d’attente est pleine (Débordement)        
+                    </span>
+                    <div class="form-line">
+                     
+                      <ng-select formControlName="tb_action" (change)="checkAction($event)">
+                      <ng-option value="PERFORM_BUSY_TREATMENT">Traitement de poste occupé</ng-option>
+                      <ng-option value="TRANSFER_TO_PHONE_NUMBER"> Transfert vers le numéro de téléphone </ng-option>
+                      <ng-option value="PLAY_RINGING_UNTIL_CALLER_HANGS_UP"> Diffuser la sonnerie jusqu’à ce que l’appelant raccroche</ng-option>
+        
+                     
+                    </ng-select>
+                      
+                      
+                    </div>
+                  </div>
+                 
+              
+              </div>
+              <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; " *ngIf="Destinationnumberforoverflow">
+                <div class="col-md-5" style="padding-bottom:0;">
+                    <div class="input-group-tous">
+                      <span class="input-group-addon">
+                          <!-- Numéro de téléphone -->
+                      </span>
+                      <div class="form-line">
+                          <ng-select 
+                          formControlName="tb_transferNumber" [searchFn]="startsWithSearchFn">
+                          <!-- <ng-option value="">Aucun</ng-option> -->
+                          <ng-option *ngFor="let num of numberPhoneTransfert"
+                            [value]="num['phoneNumber'] != null ? num['phoneNumber'] : num['extension']">{{num['owner']['firstName']}} {{num['owner']['lastName']}} ({{num['phoneNumber']}}<span *ngIf="num['phoneNumber'] != null">,</span> Ext {{num['extension']}})
+                          </ng-option>
+                        </ng-select> 
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-5" style="padding-bottom:0;">
+                    <div class="input-group-tous">
+                      <span class="input-group-addon">
+                         
+                      </span>
+                      <div class="form-line">
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input"  style="cursor: pointer;" type="checkbox" id="sendVoice" value="SKILL_BASED" formControlName="tb_sendToVoicemail">
+                          <label class="form-check-label" style="cursor: pointer;" for="sendVoice">Envoyer vers la messagerie vocale</label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                
+                
+           
+          </div>
+          <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+            <div class="col-lg-12">
+              <span class="input-group-addon">
+              
+              </span>
+            
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="activeNumberQueu" (change)="activeNumberQueu()" formControlName="tb_overflowAfterWaitEnabled">
+                <label class="form-check-label" for="activeNumberQueu">Activer le débordement après une attente de x secondes pour les appels</label>
+              </div>
+            </div>
+        
+        </div>
+        <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; " *ngIf="showactiveNumberQueu">
+          <div class="col-lg-3">
+            <span class="input-group-addon">
+             
+      
+            </span>
+            <div class="form-line">
+             
+                  <input type="number" [ngClass]="{'is-invalid': submitted && f['tb_overflowAfterWaitTime'].errors }" class="form-control" formControlName="tb_overflowAfterWaitTime">
+                  <div *ngIf="submitted && f['tb_overflowAfterWaitTime'].errors" class="invalid-feedback">
+                      <div *ngIf="f['tb_overflowAfterWaitTime'].errors['required']">
+                       Obligatoire
+                      </div>
+                    </div>
+              <!--c'est un champ obligatroire le nombre doit etre entre 0 et 250 -->
+              
+              
+            </div>
+          </div>
+          <div class="col-lg-3">
+            <span class="input-group-addon">
+             
+      
+            </span>
+            <div class="form-line">
+             
+                 secondes
+              
+            </div>
+          </div>
+      
+      </div>
+      <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+        <div class="col-lg-12">
+          <span class="input-group-addon">
+          
+          </span>
+        
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="lireAnnonce" (change)="lireAnnonce()" formControlName="tb_playOverflowGreetingEnabled">
+            <label class="form-check-label" for="lireAnnonce">Diffuser l’annonce avant le processus de débordement</label>
+          </div>
+        </div>
+     
+      </div>
+      <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; " *ngIf="showLireAnnonce">
+        <div class="col-lg-12">
+          <span class="input-group-addon">
+          
+          </span>
+        
+          <div class="form-check">
+            <input class="form-check-input" type="radio" style="cursor: pointer;" value="DEFAULT" id="typeLireAnnonce1" formControlName="tb_greeting" (change)="lireAnnouncement($event)" checked>
+            <label class="form-check-label" style="cursor: pointer;" for="typeLireAnnonce1">Lire l’annonce par défaut</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input"  style="cursor: pointer;" type="radio" id="typeLireAnnonce2" value="CUSTOM" formControlName="tb_greeting" (change)="lireAnnouncement($event)">
+            <label class="form-check-label" style="cursor: pointer;" for="typeLireAnnonce2">Lire l’annonce personnalisée</label>
+          </div>
+         
+        </div>
+      
+      </div>
+      <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; " *ngIf="showPersonnelAnnoucemnt">
+        <div class="col-lg-6">
+          <span class="input-group-addon">
+            Fichiers d'annonces
+          </span>
+          <div class="form-line">
+            <ng-select formControlName="tb_PlayedOverFlowFileName" [multiple]="true" [maxSelectedItems]="4">
+            <ng-option *ngFor="let file of listFilesAnnouncement"
+              [value]="file['fileName']">{{file['fileName']}}</ng-option>
+          </ng-select>
+          </div>
+        </div>
+      </div>
+      <!-- <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; ">
+        <div class="col-lg-12">
+          <span class="input-group-addon">
+            Fichier du message (.WAV) à lire
+          </span>
+          <div class="form-line" style="display: flex;">
+           <div style="margin: 10px;">
+            <input type="text" accept=".wav"   class="form-control" formControlName="tb_welcomeGreetingFileName" [value]="selectedFileName" disabled/>
+      
+           </div>
+           <div style="margin: 10px;">
+            <label>
+            
+              <input type="file" accept=".wav" (change)="onFileSelected($event)" style="display: none" #fileInput >
+              <button type="button" class="md-button md-button--blue-outline " (click)="onBrowseClick()" [disabled]="disabledJoinFile">Joindre un fichier</button>
+            
+            </label>
+           </div>
+           <div style="margin: 10px;">
+            <button type="button" class="md-button md-button--blue-outline " (click)="saveRecording()">Enregistrer</button>
+           </div>
+          
+          </div>
+          
+         
+         
+        </div>
+        
+      
+      </div> -->
+      <!-- <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; " *ngIf="showRecording">
+        <div class="col-lg-12">
+          <span class="input-group-addon">
+          
+          </span>
+          <div class="form-line" style="display: flex;">
+            <div style="padding: 5px;">
+              <button (click)="onRecordButtonClick()" class="startRecord">
+                <span> 
+                  <i class="bi bi-record-circle-fill" *ngIf="!isRecording"></i>
+                 
+                  <i class="bi bi-stop-circle-fill"  *ngIf="isRecording"></i>
+              </span>
+            </button> 
+            </div>
+            <div style="padding: 5px;">
+              <button (click)="onPlayButtonClick()" class="listenAudio">
+                <span>
+                  <i class="bi bi-play-circle-fill" *ngIf="!isPlaying"></i>
+                  <i class="bi bi-pause" *ngIf="isPlaying"></i>
+                </span>
+              
+              </button>
+           
+            </div>
+      <div style="padding: 5px;">
+        <input type="range" [max]="duration" [value]="currentTime" (input)="onTimeChange($event)" formControlName="tb_audio" disabled>{{currentTime}}
+      </div>
+        
+      
+          </div>
+          
+         
+         
+        </div>
+        
+      
+      </div> -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12" style="margin: 15px 0 15px 0; padding: 0; ">
+        <div id="accordionEmplacement" class="accordion">
+          <div class="card">
+            <div class="card-header">
+              <span class="Title">
+                <i class="glyphicon glyphicon-hdd"></i>
+                Annonces
+              </span>
+            </div>
+            <div id="collapseEmplacement" class="collapse show" data-parent="#accordionEmplacement">
+              <div class="card-body">
+              
+                <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                  <div class="col-lg-12">
+                    <span class="input-group-addon">
+                      Message de bienvenue        
+                    </span>
+                    <div class="form-line">
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" formControlName="tb_enabled_welcomeAnnouncement" id="enabledMes" type="checkbox" (change)="enabledWaitingMessage()">
+                       
+                      </div>
+                      
+                    </div>
+                  </div>
+                 
+              
+              </div>
+              <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; " *ngIf="showEstimationMessage">
+                <div class="col-lg-12">
+                  <span class="input-group-addon">
+                         
+                  </span>
+                  <div class="form-line">
+                    <div class="form-check">
+                      <input class="form-check-input" formControlName="tb_welcomeAnnouncementsAlways" id="enabled_alwaysEnabled" type="checkbox">
+                      <label class="form-check-label" for="enabled_alwaysEnabled">Le message de bienvenue est obligatoire</label>
+                    </div>
+                   
+                   
+                
+                    
+                    
+                  </div>
+                </div>
+               
+            
+            </div>
+            <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; " *ngIf="showEstimationMessage">
+              <div class="col-lg-12">
+                <span class="input-group-addon">
+                  Si cette option est cochée, le message de bienvenue est diffusé à chaque appelant. Si elle est décochée et que les agents sont indisponibles, l’appelant n’entend pas le message de bienvenue.
+      
+                  Type de message de bienvenue. Vous pouvez ajouter jusqu’à 4 annonces dans les paramètres après l’installation.       
+                </span>
+                <div class="form-line">
+                  <div class="form-check">
+                    <input class="form-check-input" formControlName="tb_greeting_welcomeMessage" id="welcomeAnnouncementsAlways1" type="radio" value="DEFAULT" (change)="readAnnouncementWelcomeMessage($event)">
+                    <label class="form-check-label" for="welcomeAnnouncementsAlways1">Lire l’annonce par défaut</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" formControlName="tb_greeting_welcomeMessage" id="welcomeAnnouncementsAlways2" type="radio" value="CUSTOM" (change)="readAnnouncementWelcomeMessage($event)">
+                    <label class="form-check-label" for="welcomeAnnouncementsAlways2">Lire l’annonce personnalisée</label>
+                  </div>
+                 
+                 
+               
+                  
+                  
+                </div>
+              </div>
+             
+          
+          </div>
+          <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; " *ngIf="showPersonnelAnnounceWelcomeMessage">
+            <div class="col-lg-6">
+              <span class="input-group-addon">
+                Fichiers d'annonces
+              </span>
+              <div class="form-line">
+                <ng-select formControlName="tb_WelcomeMsgFileName" [multiple]="true" [maxSelectedItems]="4">
+                <ng-option *ngFor="let file of listFilesAnnouncement"
+                  [value]="file['fileName']">{{file['fileName']}}</ng-option>
+              </ng-select>
+              </div>
+            </div>
+          </div>
+              <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                <div class="col-lg-12">
+                  <span class="input-group-addon">
+                    Estimation du message d’attente pour les appels en attente        
+                  </span>
+                  <div class="form-line">
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" formControlName="tb_waitMessageAnnouncement" type="checkbox" (change)="estimaionTypeMessage()">
+                    </div>
+                  </div>
+                </div>
+               
+            
+            </div>
+           
+          <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; " *ngIf="showEstimaionTypeMessage">
+            <div class="col-lg-3">
+              <span class="input-group-addon">
+               
+                Délai de traitement par défaut
+      
+      
+              </span>
+              <div class="form-line">
+               
+                    <input type="number" [ngClass]="{'is-invalid': submitted && f['tb_defaultHandlingTime'].errors }" class="form-control" formControlName="tb_defaultHandlingTime">
+                    <div *ngIf="submitted && f['tb_defaultHandlingTime'].errors" class="invalid-feedback">
+                        <div *ngIf="f['tb_defaultHandlingTime'].errors['required']">
+                         Obligatoire
+                        </div>
+                      </div>
+                
+                
+              </div>
+            </div>
+            <div class="col-lg-3">
+              <span class="input-group-addon">
+               
+        
+              </span>
+              <div class="form-line">
+               
+                   Minutes
+                
+              </div>
+            </div>
+        
+        </div>
+        <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+          <div class="col-lg-12">
+            <span class="input-group-addon">
+            
+            </span>
+          
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="playUpdatedEstimatedWaitMessage" (change)="nombreRepeatMessage($event)" formControlName="tb_playUpdatedEstimatedWaitMessage">
+              <label class="form-check-label" for="playUpdatedEstimatedWaitMessage">Répétez régulièrement le message d’attente estimée</label>
+            </div>
+          </div>
+      
+      </div>
+      <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; " *ngIf="showNombreRepeatMessage">
+        <div class="col-lg-3">
+          <span class="input-group-addon">
+          </span>
+          <div class="form-line">
+           
+                <input type="number" [ngClass]="{'is-invalid': submitted && f['tb_estimatedWaitingTime'].errors }" class="form-control" formControlName="tb_estimatedWaitingTime">
+                <!-- <div>Obligatoire</div> -->
+                <div *ngIf="submitted && f['tb_estimatedWaitingTime'].errors" class="invalid-feedback">
+                    <div *ngIf="f['tb_estimatedWaitingTime'].errors['required']">
+                     Obligatoire
+                    </div>
+                  </div>
+            
+            
+          </div>
+        </div>
+        <div class="col-lg-3">
+          <span class="input-group-addon">
+           
+      
+          </span>
+          <div class="form-line">
+           
+               Secondes
+            
+          </div>
+        </div>
+      
+      </div>
+      <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; " *ngIf="showEstimaionTypeMessage">
+        <div class="col-lg-12">
+          <span class="input-group-addon">
+            Message type d’attente estimée
+          </span>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" id="positionwaitMode" (change)="positionWaitMode()" value="POSITION" formControlName="tb_waitMode">
+            <label class="form-check-label" for="positionwaitMode">Annoncer la position dans la file d’attente</label>
+          </div>
+        </div>
+      </div>
+      <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; " *ngIf="showpositionWaitMode">
+        <div class="col-lg-6">
+          <span class="input-group-addon">
+            Écouter le message de l’appelant en position d’attente
+      
+          </span>
+          <div class="form-line">
+           
+                <input type="number" [ngClass]="{'is-invalid': submitted && f['tb_queuePosition'].errors }" class="form-control" formControlName="tb_queuePosition">
+                <div *ngIf="submitted && f['tb_queuePosition'].errors" class="invalid-feedback">
+                    <div *ngIf="f['tb_queuePosition'].errors['required']">
+                     Obligatoire
+                    </div>
+                  </div>
+            
+            
+          </div>
+        </div>
+        <div class="col-lg-3">
+          <span class="input-group-addon">
+           
+      
+          </span>
+          <div class="form-line">
+           <input type="hidden">
+            ou moins
+            
+          </div>
+        </div>
+      
+      
+      </div>
+      <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; " *ngIf="showEstimaionTypeMessage">
+        <div class="col-lg-12">
+          <span class="input-group-addon">
+           
+          </span>
+        
+          <div class="form-check">
+            <input class="form-check-input" type="radio" id="timewaitMode" (change)="timeWaitMode()" formControlName="tb_waitMode" value="TIME">
+            <label class="form-check-label" for="timewaitMode"> Annoncer le délai d’attente</label>
+          </div>
+        </div>
+      
+      </div>
+      <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; " *ngIf="showtimeWaitMode">
+        <div class="col-lg-6">
+          <span class="input-group-addon">
+           
+        
+            Diffuser le message pour les appelants ayant moins d’une
+      
+      
+      
+          </span>
+          <div class="form-line">
+           
+                <input type="number" [ngClass]="{'is-invalid': submitted && f['tb_handlingTime'].errors }" class="form-control" formControlName="tb_handlingTime">
+                <div *ngIf="submitted && f['tb_handlingTime'].errors" class="invalid-feedback">
+                    <div *ngIf="f['tb_handlingTime'].errors['required']">
+                     Obligatoire
+                    </div>
+                  </div>
+            
+            
+          </div>
+        </div>
+        <div class="col-lg-3">
+          <span class="input-group-addon">
+            minute d’attente
+      
+          </span>
+          <div class="form-line">
+           
+           
+      
+            
+          </div>
+        </div>
+      
+      
+      </div>
+      <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+        <div class="col-lg-12">
+          <span class="input-group-addon">
+          
+          </span>
+        
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="highVolumeMessageEnabled" formControlName="tb_highVolumeMessageEnabled">
+            <label class="form-check-label" for="highVolumeMessageEnabled">Diffuser un message à un volume d'appels élevé
+            </label>
+          </div>
+        </div>
+      
+      </div>
+      <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+        <div class="col-lg-12">
+          <span class="input-group-addon">
+            Message de confort  
+          </span>
+          <div class="form-line">
+            <div class="form-check form-switch">
+              <input class="form-check-input" formControlName="tb_enabled_comfortMessage" id="enabledConfortMessage" type="checkbox" (change)="enabledComfortMessage($event)">
+             
+            </div>
+            
+          </div>
+        </div>
+       
+      
+      </div>
+      <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; " *ngIf="showAnnouncementComfortMessage">
+        <div class="col-lg-4">
+          <span class="input-group-addon">
+            Délai entre les messages de confort
+          </span>
+          <div class="form-line">
+                <input type="number" [ngClass]="{'is-invalid': submitted && f['tb_timeBetweenMessages'].errors }" class="form-control" formControlName="tb_timeBetweenMessages">
+                <span style="display: block;">Secondes</span>
+                <div *ngIf="submitted && f['tb_timeBetweenMessages'].errors" class="invalid-feedback">
+                    <div *ngIf="f['tb_timeBetweenMessages'].errors['required']">
+                     Obligatoire
+                    </div>
+                  </div>
+          </div>
+        </div>
+      
+      
+      </div>
+      <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; " *ngIf="showAnnouncementComfortMessage">
+        <div class="col-lg-12">
+          <span class="input-group-addon">
+          
+          </span>
+        
+          <div class="form-check">
+            <input class="form-check-input" type="radio" style="cursor: pointer;" value="DEFAULT" id="comfortGreeting1" formControlName="tb_comfortGreeting" (change)="readAnnouncementComfortMessage($event)">
+            <label class="form-check-label" style="cursor: pointer;" for="comfortGreeting1">Lire l’annonce par défaut</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input"  style="cursor: pointer;" type="radio" id="comfortGreeting2" value="CUSTOM" formControlName="tb_comfortGreeting" (change)="readAnnouncementComfortMessage($event)">
+            <label class="form-check-label" style="cursor: pointer;" for="comfortGreeting2">Lire l’annonce personnalisée</label>
+          </div>
+         
+        </div>
+      
+      </div>
+      <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; " *ngIf="showPersonnelAnnounceComfortMessage">
+        <div class="col-lg-6">
+          <span class="input-group-addon">
+            Fichiers d'annonces
+          </span>
+          <div class="form-line">
+            <ng-select formControlName="tb_ComfortMsgFileName" [multiple]="true" [maxSelectedItems]="4">
+            <ng-option *ngFor="let file of listFilesAnnouncement"
+              [value]="file['fileName']">{{file['fileName']}}</ng-option>
+          </ng-select>
+          </div>
+        </div>
+      </div>
+      <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+        <div class="col-lg-12">
+          <span class="input-group-addon">
+            Passer le message d'information  
+          </span>
+          <div class="form-line">
+            <div class="form-check form-switch">
+              <input class="form-check-input" formControlName="tb_comfortBypassEnabled" type="checkbox" (change)="comfortBypassEnabled($event)">
+            
+            </div>
+           
+        
+            
+            
+          </div>
+        </div>
+       
+      
+      </div>
+      <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; " *ngIf="showcomfortBypassEnabled">
+        <div class="col-lg-4">
+          <span class="input-group-addon">
+            Passez outre le message d'information lorsque le délai d’attente estimé est inférieur au délai maximum configuré :
+          </span>
+          <div class="form-line">
+                <input type="number" [ngClass]="{'is-invalid': submitted && f['tb_callWaitingAgeThreshold'].errors }" class="form-control" formControlName="tb_callWaitingAgeThreshold">
+                <span style="display: block;">Secondes</span>
+                <div *ngIf="submitted && f['tb_callWaitingAgeThreshold'].errors" class="invalid-feedback">
+                    <div *ngIf="f['tb_callWaitingAgeThreshold'].errors['required']">
+                     Obligatoire
+                    </div>
+                  </div>
+          </div>
+        </div>
+      
+      
+      </div>
+      <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; " *ngIf="showcomfortBypassEnabled">
+        <div class="col-lg-12">
+          <span class="input-group-addon">
+          
+          </span>
+        
+          <div class="form-check">
+            <input class="form-check-input" type="radio" style="cursor: pointer;" value="DEFAULT" id="greetingType_comfortBypass1" formControlName="tb_greetingType_comfortBypass" (change)="readAnnouncementComfortMessageBypass($event)">
+            <label class="form-check-label" style="cursor: pointer;" for="greetingType_comfortBypass1">Lire l’annonce par défaut</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input"  style="cursor: pointer;" type="radio" id="greetingType_comfortBypass2" value="CUSTOM" formControlName="tb_greetingType_comfortBypass" (change)="readAnnouncementComfortMessageBypass($event)">
+            <label class="form-check-label" style="cursor: pointer;" for="greetingType_comfortBypass2">Lire l’annonce personnalisée</label>
+          </div>
+         
+        </div>
+      
+      </div>
+      <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; " *ngIf="showPersonnelAnnounceComfortMessageBypass">
+        <div class="col-lg-6">
+          <span class="input-group-addon">
+            Fichiers d'annonces
+          </span>
+          <div class="form-line">
+            <ng-select formControlName="tb_ComfortMsgByPassFileName" [multiple]="true" [maxSelectedItems]="4">
+            <ng-option *ngFor="let file of listFilesAnnouncement"
+              [value]="file['fileName']">{{file['fileName']}}</ng-option>
+          </ng-select>
+          </div>
+        </div>
+      </div>
+      <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+        <div class="col-lg-12">
+          <span class="input-group-addon">
+            Musique d’attente
+          </span>
+          <div class="form-line">
+            <div class="form-check form-switch">
+              <input class="form-check-input" formControlName="tb_mohMessageAnnouncement" type="checkbox" (change)="mohMessageAnnouncement()">
+            
+            </div>
+          </div>
+        </div>
+       
+      
+      </div>
+      <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; " *ngIf="showmohMessageAnnouncement">
+        <div class="col-lg-12">
+          <span class="input-group-addon">
+          
+          </span>
+        
+          <div class="form-check">
+            <input class="form-check-input" type="radio" style="cursor: pointer;" value="DEFAULT" id="mohMessageGreeting1" formControlName="tb_mohMessageGreeting" (change)="readAnnouncementNormalSource($event)">
+            <label class="form-check-label" style="cursor: pointer;" for="mohMessageGreeting1">Lire l’annonce par défaut</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input"  style="cursor: pointer;" type="radio" id="mohMessageGreeting2" value="CUSTOM" formControlName="tb_mohMessageGreeting" (change)="readAnnouncementNormalSource($event)">
+            <label class="form-check-label" style="cursor: pointer;" for="mohMessageGreeting2">Lire l’annonce personnalisée</label>
+          </div>
+         
+        </div>
+       
+      
+      </div>
+      <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; " *ngIf="showPersonnelAnnounceNormalSource">
+        <div class="col-lg-6">
+          <span class="input-group-addon">
+            Fichiers d'annonces
+          </span>
+          <div class="form-line">
+            <ng-select formControlName="tb_NormalSourceFileName" [multiple]="true" [maxSelectedItems]="4">
+            <ng-option *ngFor="let file of listFilesAnnouncement"
+              [value]="file['fileName']">{{file['fileName']}}</ng-option>
+          </ng-select>
+          </div>
+        </div>
+      </div>
+      <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; " *ngIf="showmohMessageAnnouncement">
+      
+        <div class="col-lg-6">
+          <span class="input-group-addon">
+          
+          </span>
+        
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" style="cursor: pointer;" id="mohAlternateMessageSource" formControlName="tb_mohAlternateMessageSource" (change)="mohAlternateMessage()">
+            <label class="form-check-label" style="cursor: pointer;" for="mohAlternateMessageSource">Utilisez une autre source pour les appels internes</label>
+          </div>
+        </div>
+      
+      </div>
+      <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; " *ngIf="showmohAlternateMessage">
+        <div class="col-lg-12">
+          <span class="input-group-addon">
+          
+          </span>
+        
+          <div class="form-check">
+            <input class="form-check-input" type="radio" style="cursor: pointer;" value="DEFAULT" id="mohMessageAlternateGreeting1" formControlName="tb_mohAlternateMessageGreeting" (change)="readAnnouncementAlternateSource($event)">
+            <label class="form-check-label" style="cursor: pointer;" for="mohMessageAlternateGreeting1">Lire l’annonce par défaut</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input"  style="cursor: pointer;" type="radio" id="mohMessageAlternateGreeting2" value="CUSTOM" formControlName="tb_mohAlternateMessageGreeting" (change)="readAnnouncementAlternateSource($event)">
+            <label class="form-check-label" style="cursor: pointer;" for="mohMessageAlternateGreeting2">Lire l’annonce personnalisée</label>
+          </div>
+        </div>
+       
+      
+      </div>
+      <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; " *ngIf="showPersonnelAnnounceAlternateSource">
+        <div class="col-lg-6">
+          <span class="input-group-addon">
+            Fichiers d'annonces
+          </span>
+          <div class="form-line">
+            <ng-select formControlName="tb_AlternateSourceFileName" [multiple]="true" [maxSelectedItems]="4">
+            <ng-option *ngFor="let file of listFilesAnnouncement"
+              [value]="file['fileName']">{{file['fileName']}}</ng-option>
+          </ng-select>
+          </div>
+        </div>
+      </div>
+      
+      
+      <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+        <div class="col-lg-12">
+          <span class="input-group-addon">
+            Mode silencieux lors des appels
+          </span>
+          <div class="form-line">
+            <div class="form-check form-switch">
+              <input class="form-check-input" formControlName="tb_whisperAnnouncement" type="checkbox" (change)="whisperAnnouncement()">
+            
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; " *ngIf="showwhisperAnnouncement">
+        <div class="col-lg-12">
+          <span class="input-group-addon">
+          
+          </span>
+        
+          <div class="form-check">
+            <input class="form-check-input" type="radio" style="cursor: pointer;" value="DEFAULT" id="greetingType_whisper1" formControlName="tb_greetingType_whisper" (change)="readAnnouncementNormalWhisperMessage($event)">
+            <label class="form-check-label" style="cursor: pointer;" for="greetingType_whisper1">Lire l’annonce par défaut</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input"  style="cursor: pointer;" type="radio" id="greetingType_whisper2" value="CUSTOM" formControlName="tb_greetingType_whisper" (change)="readAnnouncementNormalWhisperMessage($event)">
+            <label class="form-check-label" style="cursor: pointer;" for="greetingType_whisper2">Lire l’annonce personnalisée</label>
+          </div>
+        </div>
+       
+      
+      </div>
+      <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; " *ngIf="showPersonnelAnnounceWhisperMessage">
+        <div class="col-lg-6">
+          <span class="input-group-addon">
+            Fichiers d'annonces
+          </span>
+          <div class="form-line">
+            <ng-select formControlName="tb_whisperMsgFileName" [multiple]="true" [maxSelectedItems]="4">
+            <ng-option *ngFor="let file of listFilesAnnouncement"
+              [value]="file['fileName']">{{file['fileName']}}</ng-option>
+          </ng-select>
+          </div>
+        </div>
+      </div>
+      
+              </div>
+            </div>
+          </div>
+        </div>
+      </div> 
+      <div class="col-md-12" style="margin: 15px 0 15px 0; padding: 0; ">
+        <div id="accordionEmplacement" class="accordion">
+          <div class="card">
+            <div class="card-header">
+              <span class="Title">
+                <i class="glyphicon glyphicon-hdd"></i>
+                Sélectionner les agents
+              </span>
+            </div>
+            <div id="collapseEmplacement" class="collapse show" data-parent="#accordionEmplacement">
+              <div class="card-body">
+              
+                <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                  <div class="col-lg-12">
+                    <span class="input-group-addon">
+                      Sélectionnez les utilisateurs à ajouter à la file d’attente<br/>
+                      Vous avez sélectionné le routage d’appel circulaire.    <br/>
+                      <!-- Recherchez et ajoutez des utilisateurs par nom ou numéro de téléphone.     -->
+                    </span>
+                    <div class="form-line">
+                      <ng-select formControlName="tb_agents" [multiple]="true"  (change)="selectedUser($event)">
+                        <ng-option *ngFor="let numuser of NumberAndUsers"
+                          [value]="numuser['owner']['id']">
+                          {{numuser['owner']['firstName']}}  {{numuser['owner']['lastName']}} ({{numuser['phoneNumber']}} <span *ngIf="numuser['extension'] != null">
+                            <span *ngIf="numuser['extension'] != null && numuser['phoneNumber'] != null">,</span> 
+                            Ext {{numuser['extension']}}</span>)
+          
+                        </ng-option>
+                    
+                      </ng-select>
+                  
+                    </div>
+                  </div>
+              </div>
+              <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                <div class="col-lg-12">
+                  <span class="input-group-addon">
+                  
+                  </span>
+                
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" style="cursor: pointer;" id="allowCallWaitingForAgentsEnabled" formControlName="tb_allowCallWaitingForAgentsEnabled">
+                    <label class="form-check-label" style="cursor: pointer;" for="allowCallWaitingForAgentsEnabled">autoriser les agents en communication à prendre des appels supplémentaires</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input"  style="cursor: pointer;" type="checkbox" id="allowAgentJoinEnabled" formControlName="tb_allowAgentJoinEnabled">
+                    <label class="form-check-label" style="cursor: pointer;" for="allowAgentJoinEnabled">autoriser les agents à rejoindre ou à quitter la file d’attente</label>
+                  </div>
+                 
+                </div>
+               
+              
+              </div>
+              <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; " *ngIf="tableUsersSelected">
+                <div class="col-lg-12">
+                  <span class="input-group-addon">
+                  
+                  </span>
+                  <table class="table table-striped table-bordered table-hover" cellspacing="0" rules="all" >
+                    <tbody formArrayName="formCoefAndNiv">
+                      <tr style="color:#5A5A5A;background-color:#E6E6E6;font-size:10px;font-weight:bold;height:30px;">
+                      
+                        <th style="text-align: center;">Nom</th>
+                         <th style="text-align: center;">Numéro de téléphone</th>
+                         <th style="text-align: center;">Extension</th>
+                         <th style="text-align: center;" *ngIf="showCoefficient">Coefficient</th>
+                         <th style="text-align: center;" *ngIf="showniveauAptitude">Niveau d’aptitude affecté</th>
+                         <th style="text-align: center;">
+                          A/ont rejoint l’appel 
+                          <!-- <div class="form-check form-switch">
+                            <input class="form-check-input" formControlName="tb_joinEnabled" id="joinEnabled" type="checkbox">
+                           
+                          </div> -->
+                         </th>
+                        <th style="text-align: center;"></th>
+                      </tr>
+                      <ng-container  *ngFor="let coefNivForm of formCoefAndNiv.controls;let i=index">
+                        <tr style="font-size:10px;height:30px;text-align: center;" [formGroup]="coefNivForm">                                    
+                            <td> {{userSelected[i]['owner']['firstName']}}  {{userSelected[i]['owner']['lastName']}}</td>
+                            <td>{{userSelected[i]['phoneNumber']}}</td>
+                            <td>{{userSelected[i]['extension']}}</td>
+                            <td *ngIf="showCoefficient">
+                             <input type="number" max="100" min="0" maxlength="3" class="form-control" formControlName="tb_weight"> 
+                            </td>
+                            <td *ngIf="showniveauAptitude ">
+                              <ng-select formControlName="tb_skillLevel">
+                                <ng-option *ngFor="let ring of nivAptitude"   [value]="ring">{{ring}} <span *ngIf="ring == 1"> - La plus élevée</span>
+                                  <span *ngIf="ring == 20"> - La plus basse</span>
+                                </ng-option>
+                              </ng-select>
+                             </td>
+                             <td>
+                              <div class="form-check form-switch">
+                                <input class="form-check-input" formControlName="tb_joinEnabled" id="joinEnabled" type="checkbox">
+                               
+                              </div> 
+                             </td>
+                            <td>
+                                <span class="badge bg-danger" style="margin-left: 10px; font-size: 12px; cursor: pointer;" (click)="DeleteUser(userSelected[i],i)"><i class="fa fa-trash-o"
+                                  aria-hidden="true"></i>
+                                </span>
+                                 
+                            </td>
+                        </tr>
+                        
+                      </ng-container>
+                   
+                    </tbody>
+                  </table>
+                
+                 
+                </div>
+               
+              
+              </div>
+              <!-- <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; " *ngIf="tableUsersSelected">
+                <div class="col-lg-12">
+                  <span class="input-group-addon">
+                  
+                  </span>
+                  <table class="table table-striped table-bordered table-hover" cellspacing="0" rules="all" >
+                    <tbody>
+                      <tr style="color:#5A5A5A;background-color:#E6E6E6;font-size:10px;font-weight:bold;height:30px;">
+                      
+                        <th style="text-align: center;">Nom</th>
+                         <th style="text-align: center;">Numéro de téléphone</th>
+                         <th style="text-align: center;">Extension</th>
+                         <th style="text-align: center;" *ngIf="showCoefficient">Coefficient</th>
+                         <th style="text-align: center;" *ngIf="showniveauAptitude">Niveau d’aptitude affecté</th>
+                        <th style="text-align: center;"></th>
+                      </tr>
+                      <ng-container  *ngFor="let numuser of userSelected">
+                        <tr style="font-size:10px;height:30px;text-align: center;">                                    
+                            <td> {{numuser['owner']['firstName']}}  {{numuser['owner']['lastName']}}</td>
+                            <td>{{numuser['phoneNumber']}}</td>
+                            <td>{{numuser['extension']}}</td>
+                            <td *ngIf="showCoefficient">
+                             
+                             <input type="number" max="100" min="0" maxlength="3" class="form-control" formControlName="tb_weight"> 
+                            </td>
+                            <td *ngIf="showniveauAptitude ">
+                              <ng-select formControlName="tb_skillLevel">
+                                <ng-option *ngFor="let ring of nivAptitude"   [value]="ring">{{ring}} <span *ngIf="ring == 1"> - La plus élevée</span>
+                                  <span *ngIf="ring == 20"> - La plus basse</span>
+                                </ng-option>
+                                
+                              </ng-select>
+                             </td>
+                            <td>
+                             
+                                <span class="badge bg-danger" style="margin-left: 10px; font-size: 12px; cursor: pointer;" (click)="DeleteUser(numuser)"><i class="fa fa-trash-o"
+                                  aria-hidden="true"></i>
+                                </span>
+                                 
+                            </td>
+                        </tr>
+                        
+                      </ng-container>
+                   
+                    </tbody>
+                  </table>
+                
+                 
+                </div>
+               
+              
+              </div>
+       -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div> 
+      <div class="col-md-12" style="text-align: end;">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="reset" style="margin-right: 15px;" class="btn btn-danger btn-xl" (click)="close()">Annuler</button>
+            <button type="submit" style="margin-right: 15px;" class="btn btn-primary btn-xl">Modifier</button>
+          </div>
+        </div>
+    </div>
+    
+    </form>
+  </div>
+  

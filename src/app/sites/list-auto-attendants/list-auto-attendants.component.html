@@ -1,0 +1,69 @@
+<div class="row Info">
+    <div class="col-md-12">
+        <div id="accordionSites" class="accordion">
+            <div class="card">
+              <div id="collapseSites" class="collapse show" data-parent="#accordionSites">
+                <div class="card-body">
+                  <div style="margin: 15px;">
+                    <table class="table table-striped table-bordered table-hover" cellspacing="0" rules="all" >
+                        <tbody>
+                          <tr style="color:#5A5A5A;background-color:#E6E6E6;font-size:10px;font-weight:bold;height:30px;">
+                          
+                            <th style="text-align: center;">Nom du standard automatique</th>
+                             <th style="text-align: center;">nom de site</th>
+                             <th style="text-align: center;">Numéro de téléphone</th>
+                             <th style="text-align: center;">Extension</th>
+                            <th style="text-align: center;">Actions</th>
+                          </tr>
+                          <ng-container  *ngFor="let call of listAutoAttendants">
+                            <tr style="font-size:10px;height:30px;text-align: center;">                                    
+                                <td>{{call['name']}}</td>
+                                <td>{{call['locationName']}}</td>
+                                <td>{{call['phoneNumber']}}</td>
+                                <td>{{call['extension']}}</td>
+                                <td>
+                                   <span class="badge bg-info" style="cursor: pointer;font-size: 12px;" (click)="EditAutoAttendant(call)" title="Modifier"><i class="fa fa-edit" aria-hidden="true"></i></span>
+                                    <span class="badge bg-danger" style="margin-left: 10px; font-size: 12px; cursor: pointer;" (click)="DeleteSVI(call)" title="Supprimer"><i class="fa fa-trash-o"
+                                      aria-hidden="true"></i>
+                                    </span>
+                                     
+                                </td>
+                            </tr>
+                            
+                          </ng-container>
+                          <tr *ngIf="listAutoAttendants.length == 0">
+                            <td class="row_exemple" colspan="6">Aucune information</td>                            
+                          </tr> 
+                        </tbody>
+                      </table>
+                </div>
+                </div>
+              </div>
+            </div>
+          </div>
+    </div>
+
+ 
+</div>
+
+
+
+  <!-- Modal Delete CallQueue -->
+<div class="modal fade" id="myModalDeleteCallQueue" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5>Supprimer call queue</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p> Êtes-vous sûr(e) de vouloir supprimer <b>{{autoAttendant.name}}?</b> </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" #closebutton>Annuler</button>
+        <button type="button" class="btn btn-primary" (click)="ConfirmedSvi()"> Supprimer </button>
+      </div>
+    </div>
+  </div>
+</div>
+  

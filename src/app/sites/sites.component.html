@@ -1,0 +1,235 @@
+<app-loader *ngIf="loading" [TextValue]="TextValue"></app-loader>
+<div class="row Info">
+    <div class="col-md-12">
+        <div id="accordionSites" class="accordion">
+            <div class="card">
+              <div class="card-header">
+                <span class="Title">Sites</span>
+                <!-- <a class="card-link" data-toggle="collapse" href="#collapseSites">
+                  <div class="pull-right">
+                    <span class="fa fa-chevron-down"></span>
+                  </div>
+                </a> -->
+              </div>
+              <div id="collapseSites" class="collapse show" data-parent="#accordionSites">
+                <div class="card-body">
+                  <div style="margin: 15px;">
+                    <table class="table table-striped table-bordered table-hover" cellspacing="0" rules="all" >
+                        <tbody>
+                          <tr style="color:#5A5A5A;background-color:#E6E6E6;font-size:10px;font-weight:bold;height:30px;">
+                          
+                            <th style="text-align: center;">Nom de site	</th>
+                             <th style="text-align: center;">Adresse</th>
+                            <th style="text-align: center;">Voir</th>
+                          </tr>
+                          <!-- <ng-container  *ngFor="let site of paginateData; let i = index"> -->
+                            <ng-container  *ngFor="let site of sites; let i = index">
+                            <tr style="font-size:10px;height:30px;text-align: center;">                                    
+                                <td>{{site['name']}} 
+                                  <!-- <span> <i class="fa fa-exclamation-triangle" aria-hidden="true" style="color: darkorange ;" title="Le numéro principal n’est pas configuré pour cet emplacement."></i></span> -->
+                                </td>
+                                <td *ngIf="site['address']['address2']== null">{{site['address']['address1']}} - {{site['address']['postalCode']}}</td>
+                                <td *ngIf="site['address']['address2']!= null">{{site['address']['address1']}} - {{site['address']['address2']}} - {{site['address']['postalCode']}}</td>
+                                <td>
+                                      <span class="badge badge-info" style="cursor: pointer;font-size: 10px; color: black;" (click)="goToSite(site)">Voir</span>
+                                      <span class="badge badge-info" style="cursor: pointer;font-size: 10px; color: black;" (click)="updateMainNumber(site)">Numéro principal</span>
+                                      <span class="badge badge-info" style="cursor: pointer;font-size: 10px; color: black;" (click)="goToVoicePortal(site.id)">portail vocal</span>
+                                      <span class="badge badge-info" style="cursor: pointer;font-size: 10px; color: black;" (click)="AfficheCallQueuesLocation(site.id)">Call Queue</span>
+                                      <span class="badge badge-info" style="cursor: pointer;font-size: 10px; color: black;" (click)="AfficheHuntGroupsLocation(site.id)">Hunt Groups</span>
+                                      <span class="badge badge-info" style="cursor: pointer;font-size: 10px; color: black;" (click)="AfficheAutoAtandentsLocation(site.id)">Auto Attandents</span>
+                                </td>
+                            </tr>
+                          </ng-container>
+                          <tr *ngIf="sites.length == 0">
+                            <td class="row_exemple" colspan="6">Aucune information</td>                            
+                          </tr> 
+                        </tbody>
+                      </table>
+                      <!-- <ngb-pagination [collectionSize]="collectionSize" [(page)]="page" [pageSize]="pageSize" (pageChange)="getPremiumData();">
+                      </ngb-pagination> -->
+                </div>
+                </div>
+              </div>
+            </div>
+          </div>
+    </div>
+</div>
+<div class="row Info">
+    <div class="col-md-12">
+        <div id="accordionAddSite" class="accordion">
+            <div class="card">
+                <div class="card-header">
+                  <span class="Title">Informations sur le Site</span>
+                 
+                  <div class="pull-right" style="margin-right: 15px;">
+                  
+                </div>
+                <div *ngIf="!approvisionnement" style="background-color: #ffebc2; color: #a65e00; height: 40px;">
+                  <span>Les appels RTCP sortants sont désactivés pour ce site en raison de la suspension de l’abonnement Calling.</span>
+                </div>
+                </div>
+                <div id="collapseAddSite" class="collapse show" data-parent="#accordionAddSite">
+                  <div class="card-body">
+                    <div style="margin: 15px;">
+                        <app-add-site  [entID]="entID" [userid]="userid"  [orgId]="orgId" [siteModif]="siteModif" (refreshListSite)="GetSitesForEntreprise()" (loading)="getLoading($event)"></app-add-site>
+                  </div>
+                  </div>
+                </div>
+        </div>
+    </div>
+</div>
+</div>
+<div class="row Info" [ngStyle]="{'display':!editVoicePortal ? 'none' : '' }">
+  <div class="col-md-12">
+      <div id="accordionAddSite" class="accordion">
+          <div class="card">
+              <div class="card-header">
+                <span class="Title">Informations sur le portail vocal</span>
+                <a class="card-link" data-toggle="collapse" href="#collapseAddSite">
+                  <div class="pull-right">
+                    <span class="fa fa-chevron-down"></span>
+                  </div>
+                </a>
+                <div class="pull-right" style="margin-right: 15px;">
+                  <span style="cursor: pointer;">Modifier portail vocal</span>
+              </div>
+              </div>
+              <div id="collapseAddSite" class="collapse show" data-parent="#accordionAddSite">
+                <div class="card-body">
+                  <div style="margin: 15px;">
+                      <app-edit-voice-portal  [entID]="entID" [userid]="userid"  [orgId]="orgId"></app-edit-voice-portal>
+                </div>
+                </div>
+              </div>
+      </div>
+  </div>
+
+
+</div>
+</div>
+<div class="row Info" *ngIf="showCallsQueue">
+  <div class="col-md-12">
+      <div id="accordionCallPark" class="accordion">
+          <div class="card">
+              <div class="card-header">
+             
+                <span class="Title">Informations sur les calls Queues</span>
+                <a class="card-link" data-toggle="collapse" href="#collapseCallPark">
+                  <div class="pull-right">
+                    <span class="fa fa-chevron-down"></span>
+                  </div>
+                </a>
+                <div class="pull-right" style="margin-right: 15px;">
+                  <span style="cursor: pointer;" (click)="AddCallQueue()"><i class="fa fa-plus-circle" aria-hidden="true"></i> Ajouter call Queue</span>
+                  <!-- <span style="cursor: pointer;" (click)="AddCallPark()">Ajouter call Queue</span> -->
+              </div>
+              </div>
+              <div id="collapseCallPark" class="collapse show" data-parent="#accordionCallPark">
+                <div class="card-body">
+                  <div style="margin: 15px;">
+                      <app-list-call-queue  [entID]="entID" [userid]="userid"  [orgId]="orgId" [locationId]="locationId"></app-list-call-queue>
+                </div>
+                </div>
+              </div>
+      </div>
+  </div>
+</div>
+</div>
+<div class="row Info" *ngIf="ShowCallsPark">
+  <div class="col-md-12">
+      <div id="accordionCallPark" class="accordion">
+          <div class="card">
+              <div class="card-header">
+                <span class="Title">Informations sur les calls park</span>
+                <a class="card-link" data-toggle="collapse" href="#collapseCallPark">
+                  <div class="pull-right">
+                    <span class="fa fa-chevron-down"></span>
+                  </div>
+                </a>
+                <div class="pull-right" style="margin-right: 15px;">
+                  <span style="cursor: pointer;" (click)="AddCallPark()">Ajouter call park</span>
+              </div>
+              </div>
+              <div id="collapseCallPark" class="collapse show" data-parent="#accordionCallPark">
+                <div class="card-body">
+                  <div style="margin: 15px;">
+                      <app-list-calls-park  [entID]="entID" [userid]="userid"  [orgId]="orgId" [locationId]="locationId"></app-list-calls-park>
+                </div>
+                </div>
+              </div>
+      </div>
+  </div>
+</div>
+</div>
+<div class="row Info" *ngIf="ShowCallsPickup">
+  <div class="col-md-12">
+      <div id="accordionCallPark" class="accordion">
+          <div class="card">
+              <div class="card-header">
+                <span class="Title">Informations sur les calls pickup</span>
+                <a class="card-link" data-toggle="collapse" href="#collapseCallPark">
+                  <div class="pull-right">
+                    <span class="fa fa-chevron-down"></span>
+                  </div>
+                </a>
+                <div class="pull-right" style="margin-right: 15px;">
+                  <span style="cursor: pointer;" (click)="AddCallPickup()">Ajouter call park</span>
+              </div>
+              </div>
+              <div id="collapseCallPark" class="collapse show" data-parent="#accordionCallPark">
+                <div class="card-body">
+                  <div style="margin: 15px;">
+                      <app-list-calls-pickup  [entID]="entID" [userid]="userid"  [orgId]="orgId" [locationId]="locationId"></app-list-calls-pickup>
+                </div>
+                </div>
+              </div>
+      </div>
+  </div>
+</div>
+</div>
+<div class="row Info" *ngIf="showHuntGroups">
+  <div class="col-md-12">
+      <div id="accordionCallPark" class="accordion">
+          <div class="card">
+              <div class="card-header">
+                <span class="Title">Informations sur les Hunt groups</span>
+                
+                <div class="pull-right" style="margin-right: 15px;">
+                  <span style="cursor: pointer;" (click)="AddHuntGroup()"><i class="fa fa-plus-circle" aria-hidden="true"></i> Ajouter hunt group</span>
+              </div>
+              </div>
+              <div id="collapseCallPark" class="collapse show" data-parent="#accordionCallPark">
+                <div class="card-body">
+                  <div style="margin: 15px;">
+                      <app-list-hunt-groups  [entID]="entID" [userid]="userid"  [orgId]="orgId" [locationId]="locationId"></app-list-hunt-groups>
+                </div>
+                </div>
+              </div>
+      </div>
+  </div>
+</div>
+</div>
+<div class="row Info" *ngIf="showAutoAttendants">
+  <div class="col-md-12">
+      <div id="accordionCallPark" class="accordion">
+          <div class="card">
+              <div class="card-header">
+                <span class="Title">Informations sur les Standards automatique</span>
+                
+                <div class="pull-right" style="margin-right: 15px;">
+                  <span style="cursor: pointer;" (click)="AddAutoAttendant()"><i class="fa fa-plus-circle" aria-hidden="true"></i> Ajouter Standard automatique</span>
+              </div>
+              </div>
+              <div id="collapseCallPark" class="collapse show" data-parent="#accordionCallPark">
+                <div class="card-body">
+                  <div style="margin: 15px;">
+                      <app-list-auto-attendants [entID]="entID" [userid]="userid"  [orgId]="orgId" [locationId]="locationId"></app-list-auto-attendants>
+                </div>
+                </div>
+              </div>
+      </div>
+  </div>
+</div>
+</div>
+
+

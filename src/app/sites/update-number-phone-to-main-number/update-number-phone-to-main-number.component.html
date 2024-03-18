@@ -1,0 +1,41 @@
+
+<div class="modal-header">
+  <h5 class="modal-title">Numéro principal</h5>
+  <button type="button" (click)="close()" class="close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <form [formGroup]="updatemainPhoneForm" *ngIf="updatemainPhoneForm" (ngSubmit)="UpdateNumberPhoneToMainNumber()">
+    <div class="row infoIp" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+      <div class="col-md-12" style="padding-bottom:0;" >
+        <div class="input-group-tous">
+          <span class="input-group-addon">
+            <b>Numéro principal</b> <br/>
+            Pour les clients ne disposant que d’un numéro de poste, il s’agit de votre numéro d’identification de l’appelant. Pour les appels RTCP, vous pouvez attribuer ce numéro aux utilisateurs ou aux fonctions.
+          </span>
+          <div class="form-line">
+            <ng-select [ngClass]="{'is-invalid': submitted && f['selectedNumberMain'].errors }" formControlName="selectedNumberMain" required>
+              <ng-option *ngFor="let num of numbersPhone"
+                [value]="num['phoneNumber']">{{num['phoneNumber']}} <span *ngIf="num['owner'] != null">({{num['owner']['firstName']}} {{num['owner']['lastName']}})</span></ng-option>
+            </ng-select>
+            <div *ngIf="submitted && f['selectedNumberMain'].errors" class="invalid-feedback">
+                <div *ngIf="f['selectedNumberMain'].errors['required']">
+                  Il faut saisir un numéro de téléphone principal.
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12" style="text-align: end;">
+      <div class="row">
+        <div class="col-md-12">
+          <button type="reset" class="btn btn-danger btn-xl" style="margin-right: 15px;"
+            (click)="close()">Annuler</button>
+          <button type="submit" style="margin-right: 15px;" class="btn btn-primary btn-xl">Enrégistrer</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

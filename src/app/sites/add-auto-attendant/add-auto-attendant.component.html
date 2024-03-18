@@ -1,0 +1,1821 @@
+<div class="modal-header">
+  <h5 class="modal-title">Ajouter auto attendant</h5>
+  <button type="button" (click)="close()" class="close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <form [formGroup]="registerAutoAttendantForm" (ngSubmit)="onSubmit()">
+    <div class="col-md-12" style="margin: 15px 0 15px 0; padding: 0; ">
+      <div id="accordionEmplacement" class="accordion">
+        <div class="card">
+          <div class="card-header">
+            <span class="Title">
+              <i class="glyphicon glyphicon-hdd"></i>
+              Bases
+            </span>
+          </div>
+          <div id="collapseEmplacement" class="collapse show" data-parent="#accordionEmplacement">
+            <div class="card-body">
+              <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                <div class="col-lg-12">
+                  <span class="input-group-addon">
+                    Groupe de recherche Nom (*) <br />
+                    Le nom est utilisé pour l’ID de l’appelant par défaut et pour référencer le groupe de distribution
+                    des appels plus tard dans le processus.
+                  </span>
+                  <div class="form-line">
+                    <input type="text" [ngClass]="{'is-invalid': submitted && f['tb_Name'].errors }"
+                      formControlName="tb_Name" class="form-control">
+                    <div *ngIf="submitted && f['tb_Name'].errors" class="invalid-feedback">
+                      <div *ngIf="f['tb_Name'].errors['required']">
+                        Il faut saisir le nom de hunt group.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+              <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                <div class="col-md-5" style="padding-bottom:0;">
+                  <div class="input-group-tous">
+                    <span class="input-group-addon">
+                      Numéro de téléphone
+                    </span>
+                    <div class="form-line">
+                      <ng-select formControlName="tb_PhoneNumber" [searchFn]="startsWithSearchFn"
+                        (change)="setExtensionOblige($event)">
+                        <ng-option value="">Aucun</ng-option>
+                        <ng-option *ngFor="let num of numbersPhone"
+                          [value]="num['phoneNumber']">{{num['phoneNumber']}}</ng-option>
+                      </ng-select>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-2" style="padding-bottom:0;">
+                  <div class="input-group-tous">
+                    <span class="input-group-addon">
+
+                    </span>
+                    <div class="form-line">
+                      <span>et/ou</span>
+
+                    </div>
+
+                  </div>
+                </div>
+                <div class="col-md-5" style="padding-bottom:0;">
+                  <div class="input-group-tous">
+                    <span class="input-group-addon">
+                      Extension <span *ngIf="obligatoireExtension">(*)</span>
+                    </span>
+                    <div class="form-line">
+                      <input formControlName="tb_extension"
+                        [ngClass]="{'is-invalid': submitted && f['tb_extension'].errors }" class="form-control"
+                        type="text" (keypress)="extensionControl($event)"
+                        placeholder="Saisissez un numéro de deux à six chiffres">
+                      <div *ngIf="submitted && f['tb_extension'].errors" class="invalid-feedback">
+                        <div *ngIf="f['tb_extension'].errors['minlength']">La longueur ne peut pas être inférieure à 2
+                        </div>
+                        <div *ngIf="f['tb_extension'].errors['maxlength']">La longueur ne peut pas être supérieure à 6
+                        </div>
+                        <div *ngIf="f['tb_extension'].errors['pattern']">Doit saisir des chiffres
+                        </div>
+                        <div *ngIf="f['tb_extension'].errors['required']">
+                          Il faut saisir l'extension car le champ <b>numéro de téléphone</b> est vide
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                <div class="col-lg-6">
+                  <span class="input-group-addon">
+                    Prénom (*)
+
+                  </span>
+                  <div class="form-line">
+
+                    <input type="text" [ngClass]="{'is-invalid': submitted && f['tb_FirstName'].errors }"
+                      class="form-control" formControlName="tb_FirstName">
+                    <div *ngIf="submitted && f['tb_FirstName'].errors" class="invalid-feedback">
+                      <div *ngIf="f['tb_FirstName'].errors['required']">
+                        Le prénom de l’ID d’appelant de hunt group doit être renseignés.
+                      </div>
+                    </div>
+                    <!--c'est un champ obligatroire le nombre doit etre entre 0 et 250 -->
+
+
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <span class="input-group-addon">
+                    Nom (*)
+
+                  </span>
+                  <div class="form-line">
+
+                    <input type="text" [ngClass]="{'is-invalid': submitted && f['tb_LastName'].errors }"
+                      class="form-control" formControlName="tb_LastName">
+                    <div *ngIf="submitted && f['tb_LastName'].errors" class="invalid-feedback">
+                      <div *ngIf="f['tb_LastName'].errors['required']">
+                        Le nom de l’ID d’appelant de hunt group doit être renseignés.
+                      </div>
+                    </div>
+
+
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12" style="margin: 15px 0 15px 0; padding: 0; ">
+      <div id="accordionEmplacement" class="accordion">
+        <div class="card">
+          <div class="card-header">
+            <span class="Title">
+              <i class="glyphicon glyphicon-hdd"></i>
+              Horaire d’activité
+            </span>
+          </div>
+          <div id="collapseEmplacement" class="collapse show" data-parent="#accordionEmplacement">
+            <div class="card-body">
+
+              <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                <div class="col-md-9" style="padding-bottom:0;">
+                  <div class="input-group-tous">
+                    <span class="input-group-addon">
+                      Calendrier des heures ouvrables<br />
+                      Configurez les heures de fonctionnement de votre standard automatique
+                      pendant les heures ouvrables. Votre standard automatique fonctionne pendant toutes les heures
+                      restantes en dehors des heures ouvrables.
+                    </span>
+                    <div class="form-line">
+
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                <div class="col-lg-6">
+                  <span class="input-group-addon">
+
+
+                  </span>
+                  <div class="form-line">
+
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" id="aaBusinessScheduleAssign"
+                        formControlName="tb_isCreateBHSchedule" value="false" (change)="eventExist($event)">
+                      <label class="form-check-label" for="aaBusinessScheduleAssign">
+                        Attribuer un programme existant <span *ngIf="showeventExist">(*)</span>
+                      </label>
+                    </div>
+
+
+                  </div>
+                </div>
+              </div>
+              <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; " *ngIf="showeventExist">
+
+                <div class="col-lg-6">
+                  <span class="input-group-addon">
+
+
+                  </span>
+                  <div class="form-line">
+                    <div class="form-check">
+                      <ng-select placeholder="Sélectionner une option" [ngClass]="{'is-invalid': submitted && f['tb_businessSchedule'].errors }" formControlName="tb_businessSchedule" required>
+
+                        <ng-option *ngFor="let sched of listSchedulesBusinessHours"
+                          [value]="sched['name']">{{sched['name']}}</ng-option>
+                      </ng-select>
+                      <div *ngIf="submitted && f['tb_businessSchedule'].errors" class="invalid-feedback">
+                        <div *ngIf="f['tb_businessSchedule'].errors['required']">
+                          Il faut saisir le calendrier des heures ouvrables.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                <div class="col-lg-6">
+                  <span class="input-group-addon">
+                  </span>
+                  <div class="form-line">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" id="aaBusinessScheduleCreate"
+                        formControlName="tb_isCreateBHSchedule" value="true" (change)="eventExist($event)">
+                      <label class="form-check-label" for="aaBusinessScheduleCreate">
+                        Créer un nouveau programme
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="showNewSchedule">
+                <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                  <div class="col-lg-6">
+                    <span class="input-group-addon">
+                      Programme <br />
+                    </span>
+                    <div class="form-line">
+                      <span>  La nouvelle programmation montre une saisie par défaut. Vous pouvez modifier la programmation pour
+                        qu’elle réponde aux besoins de votre organisation.</span>
+                    
+                    </div>
+                  </div>
+                </div>
+                <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                  <div class="col-lg-6">
+                    <span class="input-group-addon">
+                    Nom de calendrier (*)
+                    </span>
+                    <div class="form-line">
+                      
+                      <input type="text" placeholder="Nouveau nom de calendrier" formControlName="tb_NameSchedule"
+                        class="form-control" [ngClass]="{'is-invalid': submitted && f['tb_NameSchedule'].errors }">
+                        <div *ngIf="submitted && f['tb_NameSchedule'].errors" class="invalid-feedback">
+                          <div *ngIf="f['tb_NameSchedule'].errors['required']">
+                            Il faut saisir le nom de calendrier.
+                          </div>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+
+                  <div class="col-lg-12">
+                    <div class="example-container" style="display: flex;">
+                      <mat-checkbox formControlName="tb_sunday" color="primary" style="padding: 26px;"
+                        (change)="eventDimanche()">Dimanche</mat-checkbox>
+                      &nbsp; &nbsp;
+
+                      <div *ngIf="checkedDimanche">
+                        <mat-form-field appearance="fill">
+                          <input matInput [ngxMatTimepicker]="pickerTimeDebutDimanche"
+                            formControlName="tb_startTimeDimanche" />
+                          <ngx-mat-timepicker #pickerTimeDebutDimanche></ngx-mat-timepicker>
+                        </mat-form-field>
+                        au
+                        <mat-form-field appearance="fill">
+                          <input matInput [ngxMatTimepicker]="pickerTimeFinDimanche"
+                            formControlName="tb_endTimeDimanche" />
+                          <ngx-mat-timepicker #pickerTimeFinDimanche></ngx-mat-timepicker>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+
+                  <div class="col-lg-12">
+                    <div class="example-container" style="display: flex;">
+                      <mat-checkbox formControlName="tb_monday" color="primary" style="padding: 26px;"
+                        (change)="eventLundi()">Lundi</mat-checkbox>
+                      &nbsp; &nbsp;
+
+                      <div *ngIf="checkedLundi">
+                        <mat-form-field appearance="fill">
+                          <input matInput [ngxMatTimepicker]="pickerTimeDebutLundi"
+                            formControlName="tb_startTimeLundi" />
+                          <ngx-mat-timepicker #pickerTimeDebutLundi></ngx-mat-timepicker>
+                        </mat-form-field>
+                        au
+                        <mat-form-field appearance="fill">
+                          <input matInput [ngxMatTimepicker]="pickerTimeFinLundi" formControlName="tb_endTimeLundi" />
+                          <ngx-mat-timepicker #pickerTimeFinLundi></ngx-mat-timepicker>
+                        </mat-form-field>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+                <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+
+                  <div class="col-lg-12">
+                    <div class="example-container" style="display: flex;">
+                      <mat-checkbox formControlName="tb_tuesday" color="primary"style="padding: 26px;"
+                        (change)="eventMardi()">Mardi</mat-checkbox>
+                      &nbsp; &nbsp;
+                      <div *ngIf="checkedMardi">
+                        <mat-form-field appearance="fill">
+                          <input matInput [ngxMatTimepicker]="pickerTimeDebutMardi"
+                            formControlName="tb_startTimeMardi" />
+                          <ngx-mat-timepicker #pickerTimeDebutMardi></ngx-mat-timepicker>
+                        </mat-form-field>
+                        au
+                        <mat-form-field appearance="fill">
+                          <input matInput [ngxMatTimepicker]="pickerTimeFinMardi" formControlName="tb_endTimeMardi" />
+                          <ngx-mat-timepicker #pickerTimeFinMardi></ngx-mat-timepicker>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+
+                  <div class="col-lg-12">
+                    <div class="example-container" style="display: flex;">
+                      <mat-checkbox formControlName="tb_wednesday" color="primary"style="padding: 26px;"
+                        (change)="eventMercredi()">Mercredi</mat-checkbox>
+                      &nbsp; &nbsp;
+                      <div *ngIf="checkedMercredi">
+                        <mat-form-field appearance="fill">
+                          <input matInput [ngxMatTimepicker]="pickerTimeDebutMercredi"
+                            formControlName="tb_startTimeMercredi" />
+                          <ngx-mat-timepicker #pickerTimeDebutMercredi></ngx-mat-timepicker>
+                        </mat-form-field>
+                        au
+                        <mat-form-field appearance="fill">
+                          <input matInput [ngxMatTimepicker]="pickerTimeFinMercredi"
+                            formControlName="tb_endTimeMercredi" />
+                          <ngx-mat-timepicker #pickerTimeFinMercredi></ngx-mat-timepicker>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+
+                  <div class="col-lg-12">
+                    <div class="example-container" style="display: flex;">
+                      <mat-checkbox formControlName="tb_thursday" color="primary" style="padding: 26px;"
+                        (change)="eventJeudi()">Jeudi</mat-checkbox>
+                      &nbsp; &nbsp;
+
+                      <div *ngIf="checkedJeudi">
+                        <mat-form-field appearance="fill">
+                          <input matInput [ngxMatTimepicker]="pickerTimeDebutJeudi"
+                            formControlName="tb_startTimeJeudi" />
+                          <ngx-mat-timepicker #pickerTimeDebutJeudi></ngx-mat-timepicker>
+                        </mat-form-field>
+                        au
+                        <mat-form-field appearance="fill">
+                          <input matInput [ngxMatTimepicker]="pickerTimeFinJeudi" formControlName="tb_endTimeJeudi" />
+                          <ngx-mat-timepicker #pickerTimeFinJeudi></ngx-mat-timepicker>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+
+                  <div class="col-lg-12">
+
+
+                    <div class="example-container" style="display: flex;">
+                      <mat-checkbox formControlName="tb_friday" color="primary" style="padding: 26px;"
+                        (change)="eventVendredi()">Vendredi</mat-checkbox>
+                      &nbsp; &nbsp;
+                      <div *ngIf="checkedVendredi">
+
+                        <mat-form-field appearance="fill">
+                          <input matInput [ngxMatTimepicker]="pickerTimeDebutVendredi"
+                            formControlName="tb_startTimeVendredi" />
+                          <ngx-mat-timepicker #pickerTimeDebutVendredi></ngx-mat-timepicker>
+                        </mat-form-field>
+                        au
+                        <mat-form-field appearance="fill">
+                          <input matInput [ngxMatTimepicker]="pickerTimeFinVendredi"
+                            formControlName="tb_endTimeVendredi" />
+                          <ngx-mat-timepicker #pickerTimeFinVendredi></ngx-mat-timepicker>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+
+                  <div class="col-lg-12">
+                    <div class="example-container" style="display: flex;">
+                      <mat-checkbox formControlName="tb_saturday" color="primary" style="padding: 26px;"
+                        (change)="eventSamedi()">Samedi</mat-checkbox>
+                      &nbsp; &nbsp;
+                      <div *ngIf="checkedSamedi">
+                        <mat-form-field appearance="fill">
+                          <input matInput [ngxMatTimepicker]="pickerTimeDebutSamedi"
+                            formControlName="tb_startTimeSamedi" />
+                          <ngx-mat-timepicker #pickerTimeDebutSamedi></ngx-mat-timepicker>
+                        </mat-form-field>
+                        au
+                        <mat-form-field appearance="fill">
+                          <input matInput [ngxMatTimepicker]="pickerTimeFinSamedi" formControlName="tb_endTimeSamedi" />
+                          <ngx-mat-timepicker #pickerTimeFinSamedi></ngx-mat-timepicker>
+                        </mat-form-field>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+
+                  <div class="col-lg-12">
+
+                    <span class="input-group-addon">
+                      Pause déjeuner
+                    </span>
+                    <div class="example-container" style="display: flex;">
+
+
+
+                      <mat-checkbox formControlName="tb_pauseDejeuner" color="primary"
+                        (change)="eventPauseDejeuner()">Pause déjeuner</mat-checkbox>
+                      &nbsp; &nbsp;
+
+                      <div *ngIf="checkedPauseDejeuner">
+                        <mat-form-field appearance="fill">
+                          <!-- <mat-label>TIMEPICKER</mat-label> -->
+                          <input matInput [ngxMatTimepicker]="pickerTimeDebutPauseDej"
+                            formControlName="tb_startTimePauseDejeuner" />
+                          <ngx-mat-timepicker #pickerTimeDebutPauseDej></ngx-mat-timepicker>
+                        </mat-form-field>
+                        au
+                        <mat-form-field appearance="fill">
+                          <!-- <mat-label>TIMEPICKER</mat-label> -->
+                          <input matInput [ngxMatTimepicker]="pickerTimeFinPauseDej"
+                            formControlName="tb_endTimePauseDejeuner" />
+                          <ngx-mat-timepicker #pickerTimeFinPauseDej></ngx-mat-timepicker>
+                        </mat-form-field>
+                      </div>
+                    </div>
+
+
+                    <!-- </div> -->
+
+
+
+
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12" style="margin: 15px 0 15px 0; padding: 0; ">
+      <div id="accordionEmplacement" class="accordion">
+        <div class="card">
+          <div class="card-header">
+            <span class="Title">
+              <i class="glyphicon glyphicon-hdd"></i>
+              Programme des vacances
+            </span>
+          </div>
+          <div id="collapseEmplacement" class="collapse show" data-parent="#accordionEmplacement">
+            <div class="card-body">
+
+              <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                <div class="col-md-9" style="padding-bottom:0;">
+                  <div class="input-group-tous">
+                    <span class="input-group-addon">
+                      Programme des vacances
+                      <br />
+                      Configurez les jours pendant lesquels votre standard automatique fonctionne pendant les vacances.
+                    </span>
+                    <div class="form-line">
+
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+              <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                <div class="col-lg-6">
+                  <span class="input-group-addon">
+                  </span>
+                  <div class="form-line">
+
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" id="aaHolidaysScheduleAssign"
+                        formControlName="tb_isCreateSchedule" value="false" (change)="eventExistHolidays($event)">
+                      <label class="form-check-label" for="aaHolidaysScheduleAssign">
+                        Attribuer un programme existant
+                      </label>
+                    </div>
+
+
+                  </div>
+                </div>
+              </div>
+              <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; "
+                *ngIf="showeventExistHoliday">
+
+                <div class="col-lg-6">
+                  <span class="input-group-addon">
+                  </span>
+                  <div class="form-line">
+                    <div class="form-check">
+                      <ng-select placeholder="Sélectionner une option" formControlName="tb_businessScheduleHoliday">
+                        <ng-option value="">Aucun</ng-option>
+                        <ng-option *ngFor="let sched of listSchedulesHolidays"
+                          [value]="sched['name']">{{sched['name']}}</ng-option>
+                      </ng-select>
+
+
+                    </div>
+
+
+                  </div>
+                </div>
+
+
+              </div>
+              <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                <div class="col-lg-6">
+                  <span class="input-group-addon">
+
+
+                  </span>
+                  <div class="form-line">
+
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" id="aaHolidaysScheduleCreate"
+                        formControlName="tb_isCreateSchedule" value="true" (change)="eventExistHolidays($event)">
+                      <label class="form-check-label" for="aaHolidaysScheduleCreate">
+                        Créer un nouveau programme
+                      </label>
+                    </div>
+
+
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="showNewScheduleHoliday">
+                <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-6">
+                      <span class="input-group-addon">
+
+                      </span>
+                      <div class="form-line" appearance="fill">
+                        <input type="text" placeholder="Nouveau nom du calendrier personnalisé des vacances"
+                          formControlName="tb_NameScheduleHoliday" class="form-control">
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+
+                    <table class="table table-striped table-bordered table-hover" cellspacing="0" rules="all">
+                      <tbody>
+                        <tr style="color:#5A5A5A;background-color:#E6E6E6;font-size:10px;font-weight:bold;height:30px;">
+
+                          <th style="text-align: center;"> Nom du jour de congé </th>
+                          <th style="text-align: center;">Répéter</th>
+                          <th style="text-align: center;"> Heure de démarrage </th>
+                          <th style="text-align: center;">Heure de fin</th>
+                          <th style="text-align: center;">Actions</th>
+                        </tr>
+                        <ng-container *ngFor="let event of eventsHolidays">
+                          <tr style="font-size:10px;height:30px;">
+
+                            <td>{{event['name']}}
+                            </td>
+                            <td> {{event['recurenceData']}}</td>
+                            <td>{{getFormatDate(event['startDate'])}}
+                            </td>
+                            <td>{{getFormatDate(event['endDate'])}}</td>
+                            <td>
+
+                              <span class="badge bg-info" (click)="modfierEvent(event)"
+                                style="cursor: pointer;font-size: 12px;"><i class="fa fa-edit"
+                                  aria-hidden="true"></i></span>
+                              <!-- <span class="badge bg-info" (click)="EditUser(user)" style="cursor: pointer;font-size: 12px;"><i
+                                    class="fa fa-edit" aria-hidden="true"></i></span> -->
+                              <span class="badge bg-danger" style="margin-left: 10px; font-size: 12px; cursor: pointer; color: #E6E6E6;
+                                  cursor: pointer;" (click)="deleteEvent(event)"><i class="fa fa-trash-o"
+                                  aria-hidden="true"></i></span>
+                            </td>
+                          </tr>
+                        </ng-container>
+                        <tr *ngIf="eventsHolidays.length == 0">
+                          <td class="row_exemple" colspan="6">Veuillez ajouter un congé ci-dessous pour afficher la
+                            liste des congés.</td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+
+
+
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-6">
+
+                      <div class="form-line" appearance="fill">
+                        <span class="btn" style="color: #3492eb!important;" (click)="addEventHoliday()"><i
+                            class="fa fa-plus-circle" aria-hidden="true"></i>&nbsp;&nbsp; Ajouter un nouveau jour férié
+                          au calendrier des vacances</span>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; "
+                    *ngIf="showAddEventHoliday">
+                    <div class="col-lg-6">
+                      <span class="input-group-addon">
+                        Nom du jour de congé
+                      </span>
+                      <div class="form-line" appearance="fill">
+                        <input type="text" placeholder="Nouveau nom du calendrier persor"
+                          (keyup)="remplirNameEventConge()" formControlName="tb_NameEventScheduleHoliday"
+                          class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-lg-3">
+                      <span class="input-group-addon">
+                        Récurrence
+                      </span>
+                      <div class="form-line">
+
+                        <ng-select formControlName="tb_Recurence" (change)="getDataRecurence($event)">
+                          <ng-option value="Aucun">Aucun</ng-option>
+                          <ng-option value="Hebdomadaire">Hebdomadaire</ng-option>
+                          <ng-option value="Annuel">Annuel</ng-option>
+                        </ng-select>
+                      </div>
+                    </div>
+                    <div class="col-lg-3">
+                      <span class="input-group-addon">
+
+                      </span>
+                      <div class="form-line">
+
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" style="cursor: pointer;" type="checkbox" id="sendVoice"
+                            (change)="toutJourne()" formControlName="tb_toutJourne">
+                          <label class="form-check-label" style="cursor: pointer;" for="sendVoice">Toute la
+                            journée</label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; "
+                    *ngIf="showAddEventHoliday && recurenceWeekly">
+                    <div class="col-lg-6">
+                      <span class="input-group-addon">
+                        Se répète le(s)
+                      </span>
+                      <div class="form-line">
+
+                        <ng-select formControlName="tb_dayConge">
+                          <ng-option *ngFor="let day of listDays" [value]="day['value']">{{day['name']}}</ng-option>
+
+                        </ng-select>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="row Info"
+                    style="width: 100%; margin: 15px 0 15px 0; padding: 0; display: flex; align-items: baseline;"
+                    *ngIf="showAddEventHoliday && recurenceMonth">
+
+                    <div class="col-lg-3" style="display: flex;align-items: baseline">
+
+                      <!-- <div class="form-line"> -->
+                      <span style="padding: 20px;">Par</span>
+                      <ng-select formControlName="tb_TypeConge" style=" flex: 1;
+                       flex-grow: 1;
+                       flex-shrink: 1;
+                       flex-basis: 0%;" (change)="choiseDateorDay($event)">
+                        <ng-option value="Jour">Jour</ng-option>
+                        <ng-option value="Date">Date</ng-option>
+                      </ng-select>
+                      <!-- </div> -->
+                    </div>
+                    <div class="col-lg-3" style="display: flex;align-items: baseline">
+
+                      <!-- <div class="form-line" style="display: flex;align-items: baseline"> -->
+
+                      <span style="padding: 20px;">Le</span>
+
+                      <ng-select formControlName="tb_timeWeekConge" style=" flex: 1;
+                      flex-grow: 1;
+                      flex-shrink: 1;
+                      flex-basis: 0%;" *ngIf="parDay">
+                        <ng-option value="FIRST">Premier</ng-option>
+                        <ng-option value="SECOND">Deuxième</ng-option>
+                        <ng-option value="THIRD">Troisième</ng-option>
+                        <ng-option value="FOURTH">Quatrième</ng-option>
+                        <ng-option value="LAST">Dernier</ng-option>
+                      </ng-select>
+
+                      <input min="1" max="29" *ngIf="parDate" type="number" class="form-control"
+                        formControlName="tb_dateInput">
+
+
+                    </div>
+                    <div class="col-lg-3" *ngIf="parDay">
+
+                      <div class="form-line">
+
+                        <ng-select formControlName="tb_day_mounthConge">
+                          <ng-option *ngFor="let day of listDays" [value]="day['value']">{{day['name']}}</ng-option>
+
+                        </ng-select>
+
+
+                      </div>
+                    </div>
+                    <div class="col-lg-3" style="display: flex; align-items: baseline;">
+
+                      <!-- <div class="form-line" style="display: flex;"> -->
+
+                      <span style="padding: 20px;">De</span>
+                      <ng-select formControlName="tb_Month" style=" flex: 1;
+                       flex-grow: 1;
+                       flex-shrink: 1;
+                       flex-basis: 0%;">
+                        <ng-option *ngFor="let mon of listMonth" [value]="mon['value']">{{mon['name']}}</ng-option>
+
+                      </ng-select>
+                      <!-- </div> -->
+                    </div>
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; display: flex;"
+                    *ngIf="showAddEventHoliday">
+                    <div class="col-lg-12">
+                      <span class="input-group-addon">
+                        Durée des congés
+                      </span>
+                      <div class="form-line" style="display: flex;">
+                        <span style="padding: 20px;">Du</span>
+                        <mat-form-field>
+                          <input matInput [matDatepicker]="pickerDateDebutConge" formControlName="tb_dateDebutConge"
+                            (dateChange)="comparedate()">
+                          <mat-datepicker-toggle matSuffix [for]="pickerDateDebutConge"></mat-datepicker-toggle>
+                          <mat-datepicker #pickerDateDebutConge></mat-datepicker>
+                        </mat-form-field>&nbsp;&nbsp;
+                        <mat-form-field *ngIf="showTime">
+                          <!-- <mat-label>TIMEPICKER</mat-label> -->
+                          <input matInput [ngxMatTimepicker]="pickerTimeDebutConge"
+                            formControlName="tb_timeDebutConge" />
+                          <ngx-mat-timepicker #pickerTimeDebutConge
+                            (timeChanged)="compareTime($event,'Debut')"></ngx-mat-timepicker>
+                        </mat-form-field>&nbsp;&nbsp;
+                        <span style="padding: 20px;">au</span>
+                        <mat-form-field>
+                          <input matInput [matDatepicker]="pickerDateFinConge" formControlName="tb_dateFinConge"
+                            (dateChange)="comparedate()">
+                          <mat-datepicker-toggle matSuffix [for]="pickerDateFinConge"></mat-datepicker-toggle>
+                          <mat-datepicker #pickerDateFinConge></mat-datepicker>
+                        </mat-form-field>&nbsp;&nbsp;
+                        <mat-form-field *ngIf="showTime">
+                          <input matInput [ngxMatTimepicker]="pickerTimeFinConge" formControlName="tb_timeFinConge" />
+                          <ngx-mat-timepicker #pickerTimeFinConge
+                            (timeChanged)="compareTime($event,'Fin')"></ngx-mat-timepicker>
+                        </mat-form-field>
+
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; "
+                    *ngIf="showAddEventHoliday && !correctDate" style="display: flex;">
+                    <i class="fa fa-times" aria-hidden="true" style="color: red;">
+                      <span style="color: red;"> Démarrer heure ou arrêter heure n’est pas valide. Veuillez saisir un
+                        heure valide.</span>
+                    </i>
+
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; "
+                    *ngIf="showAddEventHoliday">
+
+                    <div class="row">
+                      <div class="col-md-12">
+                        <button type="button" style="margin-right: 15px;" class="md-button"
+                          (click)="annuleAddEvent()">Annuler</button>
+                        <button type="button" [disabled]="notAddEvent" (click)="saveEventsHolidays()"
+                          style="margin-right: 15px;" class="md-button">Enregistrer</button>
+                      </div>
+                    </div>
+
+                  </div>
+
+                </div>
+
+
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12" style="margin: 15px 0 15px 0; padding: 0; ">
+      <div id="accordionEmplacement" class="accordion">
+        <div class="card">
+          <div class="card-header">
+            <span class="Title">
+              <i class="glyphicon glyphicon-hdd"></i>
+              Menu
+            </span>
+          </div>
+          <div id="collapseEmplacement" class="collapse show" data-parent="#accordionEmplacement">
+            <div class="card-body">
+              <mat-tab-group>
+                <mat-tab label="Heures ouvrables">
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-12">
+                      Menu des heures ouvrables <br />
+                      Veuillez attribuer des fonctions différentes à chaque numéro du clavier. Ces paramètres dirigent
+                      vos clients où ils le souhaitent lorsqu’ils saisissent un numéro spécifique sur le clavier.
+                    </div>
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-12">
+                      <span class="input-group-addon">
+
+                      </span>
+                      <div class="form-line">
+                        <div class="form-check">
+                          <input style="cursor: pointer;" class="form-check-input" type="checkbox"
+                            formControlName="tb_businessExtensionEnabled" id="businessExtensionEnabled">
+                          <label class="form-check-label" for="businessExtensionEnabled">Activez la numérotation du
+                            numéro de poste sans nécessiter d’élément de menu.</label>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-3">
+                      Appuyer sur 0 pour
+
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-line">
+                        <ng-select formControlName="tb_action_HO_0" (change)="showTransferNumber($event,'0')">
+                          <ng-option *ngFor="let action of listAction"
+                            [value]="action['value']">{{action['name']}}</ng-option>
+                        </ng-select>
+
+                      </div>
+                    </div>
+
+                    <div class="col-md-5" style="padding-bottom:0;" *ngIf="transferNumber_0">
+                      <div class="input-group-tous">
+                        <span class="input-group-addon">
+                          <!-- Numéro de téléphone -->
+                        </span>
+                        <div class="form-line">
+
+                          <ng-select placeholder="Numéro de téléphone ou poste" formControlName="tb_transferNumber_0"
+                            [searchFn]="startsWithSearchFn">
+                            <!-- <ng-option value="">Aucun</ng-option> -->
+                            <ng-option *ngFor="let num of numberPhoneTransfert"
+                              [value]="num['phoneNumber'] != null ? num['phoneNumber'] : num['extension']">{{num['owner']['firstName']}}
+                              {{num['owner']['lastName']}} ({{num['phoneNumber']}}<span
+                                *ngIf="num['phoneNumber'] != null">,</span> Ext {{num['extension']}})
+                            </ng-option>
+                          </ng-select>
+
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-3">
+                      Appuyer sur 1 pour
+
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-line">
+                        <ng-select formControlName="tb_action_HO_1" (change)="showTransferNumber($event,'1')">
+                          <ng-option *ngFor="let action of listAction"
+                            [value]="action['value']">{{action['name']}}</ng-option>
+                        </ng-select>
+
+                      </div>
+                    </div>
+                    <div class="col-md-5" style="padding-bottom:0;" *ngIf="transferNumber_1">
+                      <div class="input-group-tous">
+                        <span class="input-group-addon">
+                          <!-- Numéro de téléphone -->
+                        </span>
+                        <div class="form-line">
+
+                          <ng-select placeholder="Numéro de téléphone ou poste" formControlName="tb_transferNumber_1"
+                            [searchFn]="startsWithSearchFn">
+                            <!-- <ng-option value="">Aucun</ng-option> -->
+                            <ng-option *ngFor="let num of numberPhoneTransfert"
+                              [value]="num['phoneNumber'] != null ? num['phoneNumber'] : num['extension']">{{num['owner']['firstName']}}
+                              {{num['owner']['lastName']}} ({{num['phoneNumber']}}<span
+                                *ngIf="num['phoneNumber'] != null">,</span> Ext {{num['extension']}})
+                            </ng-option>
+                          </ng-select>
+
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-3">
+                      Appuyer sur 2 pour
+
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-line">
+                        <ng-select formControlName="tb_action_HO_2" (change)="showTransferNumber($event,'2')">
+                          <ng-option *ngFor="let action of listAction"
+                            [value]="action['value']">{{action['name']}}</ng-option>
+                        </ng-select>
+
+                      </div>
+                    </div>
+                    <div class="col-md-5" style="padding-bottom:0;" *ngIf="transferNumber_2">
+                      <div class="input-group-tous">
+                        <span class="input-group-addon">
+                          <!-- Numéro de téléphone -->
+                        </span>
+                        <div class="form-line">
+
+                          <ng-select placeholder="Numéro de téléphone ou poste" formControlName="tb_transferNumber_2"
+                            [searchFn]="startsWithSearchFn">
+                            <!-- <ng-option value="">Aucun</ng-option> -->
+                            <ng-option *ngFor="let num of numberPhoneTransfert"
+                              [value]="num['phoneNumber'] != null ? num['phoneNumber'] : num['extension']">{{num['owner']['firstName']}}
+                              {{num['owner']['lastName']}} ({{num['phoneNumber']}}<span
+                                *ngIf="num['phoneNumber'] != null">,</span> Ext {{num['extension']}})
+                            </ng-option>
+                          </ng-select>
+
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-3">
+                      Appuyer sur 3 pour
+
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-line">
+                        <ng-select formControlName="tb_action_HO_3" (change)="showTransferNumber($event,'3')">
+                          <ng-option *ngFor="let action of listAction"
+                            [value]="action['value']">{{action['name']}}</ng-option>
+                        </ng-select>
+
+                      </div>
+                    </div>
+                    <div class="col-md-5" style="padding-bottom:0;" *ngIf="transferNumber_3">
+                      <div class="input-group-tous">
+                        <span class="input-group-addon">
+                          <!-- Numéro de téléphone -->
+                        </span>
+                        <div class="form-line">
+
+                          <ng-select placeholder="Numéro de téléphone ou poste" formControlName="tb_transferNumber_3"
+                            [searchFn]="startsWithSearchFn">
+                            <!-- <ng-option value="">Aucun</ng-option> -->
+                            <ng-option *ngFor="let num of numberPhoneTransfert"
+                              [value]="num['phoneNumber'] != null ? num['phoneNumber'] : num['extension']">{{num['owner']['firstName']}}
+                              {{num['owner']['lastName']}} ({{num['phoneNumber']}}<span
+                                *ngIf="num['phoneNumber'] != null">,</span> Ext {{num['extension']}})
+                            </ng-option>
+                          </ng-select>
+
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-3">
+                      Appuyer sur 4 pour
+
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-line">
+                        <ng-select formControlName="tb_action_HO_4" (change)="showTransferNumber($event,'4')">
+                          <ng-option *ngFor="let action of listAction"
+                            [value]="action['value']">{{action['name']}}</ng-option>
+                        </ng-select>
+                      </div>
+                    </div>
+                    <div class="col-md-5" style="padding-bottom:0;" *ngIf="transferNumber_4">
+                      <div class="input-group-tous">
+                        <span class="input-group-addon">
+                          <!-- Numéro de téléphone -->
+                        </span>
+                        <div class="form-line">
+
+                          <ng-select placeholder="Numéro de téléphone ou poste" formControlName="tb_transferNumber_4"
+                            [searchFn]="startsWithSearchFn">
+                            <!-- <ng-option value="">Aucun</ng-option> -->
+                            <ng-option *ngFor="let num of numberPhoneTransfert"
+                              [value]="num['phoneNumber'] != null ? num['phoneNumber'] : num['extension']">{{num['owner']['firstName']}}
+                              {{num['owner']['lastName']}} ({{num['phoneNumber']}}<span
+                                *ngIf="num['phoneNumber'] != null">,</span> Ext {{num['extension']}})
+                            </ng-option>
+                          </ng-select>
+
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-3">
+                      Appuyer sur 5 pour
+
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-line">
+                        <ng-select formControlName="tb_action_HO_5" (change)="showTransferNumber($event,'5')">
+                          <ng-option *ngFor="let action of listAction"
+                            [value]="action['value']">{{action['name']}}</ng-option>
+                        </ng-select>
+                      </div>
+                    </div>
+                    <div class="col-md-5" style="padding-bottom:0;" *ngIf="transferNumber_5">
+                      <div class="input-group-tous">
+                        <span class="input-group-addon">
+                          <!-- Numéro de téléphone -->
+                        </span>
+                        <div class="form-line">
+
+                          <ng-select placeholder="Numéro de téléphone ou poste" formControlName="tb_transferNumber_5"
+                            [searchFn]="startsWithSearchFn">
+                            <!-- <ng-option value="">Aucun</ng-option> -->
+                            <ng-option *ngFor="let num of numberPhoneTransfert"
+                              [value]="num['phoneNumber'] != null ? num['phoneNumber'] : num['extension']">{{num['owner']['firstName']}}
+                              {{num['owner']['lastName']}} ({{num['phoneNumber']}}<span
+                                *ngIf="num['phoneNumber'] != null">,</span> Ext {{num['extension']}})
+                            </ng-option>
+                          </ng-select>
+
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-3">
+                      Appuyer sur 6 pour
+
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-line">
+                        <ng-select formControlName="tb_action_HO_6" (change)="showTransferNumber($event,'6')">
+                          <ng-option *ngFor="let action of listAction"
+                            [value]="action['value']">{{action['name']}}</ng-option>
+                        </ng-select>
+                      </div>
+                    </div>
+                    <div class="col-md-5" style="padding-bottom:0;" *ngIf="transferNumber_6">
+                      <div class="input-group-tous">
+                        <span class="input-group-addon">
+                          <!-- Numéro de téléphone -->
+                        </span>
+                        <div class="form-line">
+
+                          <ng-select placeholder="Numéro de téléphone ou poste" formControlName="tb_transferNumber_6"
+                            [searchFn]="startsWithSearchFn">
+                            <!-- <ng-option value="">Aucun</ng-option> -->
+                            <ng-option *ngFor="let num of numberPhoneTransfert"
+                              [value]="num['phoneNumber'] != null ? num['phoneNumber'] : num['extension']">{{num['owner']['firstName']}}
+                              {{num['owner']['lastName']}} ({{num['phoneNumber']}}<span
+                                *ngIf="num['phoneNumber'] != null">,</span> Ext {{num['extension']}})
+                            </ng-option>
+                          </ng-select>
+
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-3">
+                      Appuyer sur 7 pour
+
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-line">
+                        <ng-select formControlName="tb_action_HO_7" (change)="showTransferNumber($event,'7')">
+                          <ng-option *ngFor="let action of listAction"
+                            [value]="action['value']">{{action['name']}}</ng-option>
+                        </ng-select>
+                      </div>
+                    </div>
+                    <div class="col-md-5" style="padding-bottom:0;" *ngIf="transferNumber_7">
+                      <div class="input-group-tous">
+                        <span class="input-group-addon">
+                          <!-- Numéro de téléphone -->
+                        </span>
+                        <div class="form-line">
+
+                          <ng-select placeholder="Numéro de téléphone ou poste" formControlName="tb_transferNumber_7"
+                            [searchFn]="startsWithSearchFn">
+                            <!-- <ng-option value="">Aucun</ng-option> -->
+                            <ng-option *ngFor="let num of numberPhoneTransfert"
+                              [value]="num['phoneNumber'] != null ? num['phoneNumber'] : num['extension']">{{num['owner']['firstName']}}
+                              {{num['owner']['lastName']}} ({{num['phoneNumber']}}<span
+                                *ngIf="num['phoneNumber'] != null">,</span> Ext {{num['extension']}})
+                            </ng-option>
+                          </ng-select>
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-3">
+                      Appuyer sur 8 pour
+
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-line">
+                        <ng-select formControlName="tb_action_HO_8" (change)="showTransferNumber($event,'8')">
+                          <ng-option *ngFor="let action of listAction"
+                            [value]="action['value']">{{action['name']}}</ng-option>
+                        </ng-select>
+                      </div>
+                    </div>
+                    <div class="col-md-5" style="padding-bottom:0;" *ngIf="transferNumber_8">
+                      <div class="input-group-tous">
+                        <span class="input-group-addon">
+                          <!-- Numéro de téléphone -->
+                        </span>
+                        <div class="form-line">
+
+                          <ng-select placeholder="Numéro de téléphone ou poste" formControlName="tb_transferNumber_8"
+                            [searchFn]="startsWithSearchFn">
+                            <!-- <ng-option value="">Aucun</ng-option> -->
+                            <ng-option *ngFor="let num of numberPhoneTransfert"
+                              [value]="num['phoneNumber'] != null ? num['phoneNumber'] : num['extension']">{{num['owner']['firstName']}}
+                              {{num['owner']['lastName']}} ({{num['phoneNumber']}}<span
+                                *ngIf="num['phoneNumber'] != null">,</span> Ext {{num['extension']}})
+                            </ng-option>
+                          </ng-select>
+
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-3">
+                      Appuyer sur 9 pour
+
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-line">
+                        <ng-select formControlName="tb_action_HO_9" (change)="showTransferNumber($event,'9')">
+                          <ng-option *ngFor="let action of listAction"
+                            [value]="action['value']">{{action['name']}}</ng-option>
+                        </ng-select>
+                      </div>
+                    </div>
+                    <div class="col-md-5" style="padding-bottom:0;" *ngIf="transferNumber_9">
+                      <div class="input-group-tous">
+                        <span class="input-group-addon">
+                          <!-- Numéro de téléphone -->
+                        </span>
+                        <div class="form-line">
+
+                          <ng-select placeholder="Numéro de téléphone ou poste" formControlName="tb_transferNumber_9"
+                            [searchFn]="startsWithSearchFn">
+                            <!-- <ng-option value="">Aucun</ng-option> -->
+                            <ng-option *ngFor="let num of numberPhoneTransfert"
+                              [value]="num['phoneNumber'] != null ? num['phoneNumber'] : num['extension']">{{num['owner']['firstName']}}
+                              {{num['owner']['lastName']}} ({{num['phoneNumber']}}<span
+                                *ngIf="num['phoneNumber'] != null">,</span> Ext {{num['extension']}})
+                            </ng-option>
+                          </ng-select>
+
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-3">
+                      Appuyer sur * pour
+
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-line">
+                        <ng-select formControlName="tb_action_HO_etoile" (change)="showTransferNumber($event,'*')">
+                          <ng-option *ngFor="let action of listAction"
+                            [value]="action['value']">{{action['name']}}</ng-option>
+                        </ng-select>
+                      </div>
+                    </div>
+                    <div class="col-md-5" style="padding-bottom:0;" *ngIf="transferNumber_etoile">
+                      <div class="input-group-tous">
+                        <span class="input-group-addon">
+                          <!-- Numéro de téléphone -->
+                        </span>
+                        <div class="form-line">
+
+                          <ng-select placeholder="Numéro de téléphone ou poste"
+                            formControlName="tb_transferNumber_etoile" [searchFn]="startsWithSearchFn">
+                            <!-- <ng-option value="">Aucun</ng-option> -->
+                            <ng-option *ngFor="let num of numberPhoneTransfert"
+                              [value]="num['phoneNumber'] != null ? num['phoneNumber'] : num['extension']">{{num['owner']['firstName']}}
+                              {{num['owner']['lastName']}} ({{num['phoneNumber']}}<span
+                                *ngIf="num['phoneNumber'] != null">,</span> Ext {{num['extension']}})
+                            </ng-option>
+                          </ng-select>
+
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-3">
+                      Appuyer sur # pour
+
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-line">
+                        <ng-select formControlName="tb_action_HO_diese" (change)="showTransferNumber($event,'#')">
+                          <ng-option *ngFor="let action of listAction"
+                            [value]="action['value']">{{action['name']}}</ng-option>
+                        </ng-select>
+                      </div>
+                    </div>
+                    <div class="col-md-5" style="padding-bottom:0;" *ngIf="transferNumber_diese">
+                      <div class="input-group-tous">
+                        <span class="input-group-addon">
+                          <!-- Numéro de téléphone -->
+                        </span>
+                        <div class="form-line">
+
+                          <ng-select placeholder="Numéro de téléphone ou poste"
+                            formControlName="tb_transferNumber_diese" [searchFn]="startsWithSearchFn">
+                            <!-- <ng-option value="">Aucun</ng-option> -->
+                            <ng-option *ngFor="let num of numberPhoneTransfert"
+                              [value]="num['phoneNumber'] != null ? num['phoneNumber'] : num['extension']">{{num['owner']['firstName']}}
+                              {{num['owner']['lastName']}} ({{num['phoneNumber']}}<span
+                                *ngIf="num['phoneNumber'] != null">,</span> Ext {{num['extension']}})
+                            </ng-option>
+                          </ng-select>
+
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </mat-tab>
+                <mat-tab label="Après les heures ouvrables">
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-12">
+                      Menu après les heures ouvrables <br />
+
+                      Attribuez des fonctions différentes à chaque numéro de clavier pour indiquer à vos clients où ils
+                      doivent aller lorsqu’ils saisissent un numéro spécifique sur leur téléphone. Le menu que vous avez
+                      défini pour les heures après les heures ouvrables s’applique également au calendrier des vacances.
+                    </div>
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-12">
+                      <span class="input-group-addon">
+
+                      </span>
+                      <div class="form-line">
+                        <div class="form-check">
+                          <input style="cursor: pointer;" class="form-check-input" type="checkbox"
+                            formControlName="tb_afterExtensionEnabled" id="afterExtensionEnabled">
+                          <label class="form-check-label" for="afterExtensionEnabled">Activez la numérotation du numéro
+                            de poste sans nécessiter d’élément de menu.</label>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-3">
+                      Appuyer sur 0 pour
+
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-line">
+                        <ng-select formControlName="tb_action_AHO_0" (change)="showTransferNumberHoliday($event,'0')">
+                          <ng-option *ngFor="let action of listAction"
+                            [value]="action['value']">{{action['name']}}</ng-option>
+                        </ng-select>
+
+                      </div>
+                    </div>
+                    <div class="col-md-5" style="padding-bottom:0;" *ngIf="transferNumber_H_0">
+                      <div class="input-group-tous">
+                        <span class="input-group-addon">
+                          <!-- Numéro de téléphone -->
+                        </span>
+                        <div class="form-line">
+
+                          <ng-select placeholder="Numéro de téléphone ou poste"
+                            formControlName="tb_transferNumber_AHO_0" [searchFn]="startsWithSearchFn">
+                            <ng-option *ngFor="let num of numberPhoneTransfert"
+                              [value]="num['phoneNumber'] != null ? num['phoneNumber'] : num['extension']">{{num['owner']['firstName']}}
+                              {{num['owner']['lastName']}} ({{num['phoneNumber']}}<span
+                                *ngIf="num['phoneNumber'] != null">,</span> Ext {{num['extension']}})
+                            </ng-option>
+                          </ng-select>
+
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-3">
+                      Appuyer sur 1 pour
+
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-line">
+                        <ng-select formControlName="tb_action_AHO_1" (change)="showTransferNumberHoliday($event,'1')">
+                          <ng-option *ngFor="let action of listAction"
+                            [value]="action['value']">{{action['name']}}</ng-option>
+                        </ng-select>
+
+                      </div>
+                    </div>
+                    <div class="col-md-5" style="padding-bottom:0;" *ngIf="transferNumber_H_1">
+                      <div class="input-group-tous">
+                        <span class="input-group-addon">
+                          <!-- Numéro de téléphone -->
+                        </span>
+                        <div class="form-line">
+
+                          <ng-select placeholder="Numéro de téléphone ou poste"
+                            formControlName="tb_transferNumber_AHO_1" [searchFn]="startsWithSearchFn">
+                            <ng-option *ngFor="let num of numberPhoneTransfert"
+                              [value]="num['phoneNumber'] != null ? num['phoneNumber'] : num['extension']">{{num['owner']['firstName']}}
+                              {{num['owner']['lastName']}} ({{num['phoneNumber']}}<span
+                                *ngIf="num['phoneNumber'] != null">,</span> Ext {{num['extension']}})
+                            </ng-option>
+                          </ng-select>
+
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-3">
+                      Appuyer sur 2 pour
+
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-line">
+                        <ng-select formControlName="tb_action_AHO_2" (change)="showTransferNumberHoliday($event,'2')">
+                          <ng-option *ngFor="let action of listAction"
+                            [value]="action['value']">{{action['name']}}</ng-option>
+                        </ng-select>
+
+                      </div>
+                    </div>
+                    <div class="col-md-5" style="padding-bottom:0;" *ngIf="transferNumber_H_2">
+                      <div class="input-group-tous">
+                        <span class="input-group-addon">
+                          <!-- Numéro de téléphone -->
+                        </span>
+                        <div class="form-line">
+
+                          <ng-select placeholder="Numéro de téléphone ou poste"
+                            formControlName="tb_transferNumber_AHO_2" [searchFn]="startsWithSearchFn">
+                            <ng-option *ngFor="let num of numberPhoneTransfert"
+                              [value]="num['phoneNumber'] != null ? num['phoneNumber'] : num['extension']">{{num['owner']['firstName']}}
+                              {{num['owner']['lastName']}} ({{num['phoneNumber']}}<span
+                                *ngIf="num['phoneNumber'] != null">,</span> Ext {{num['extension']}})
+                            </ng-option>
+                          </ng-select>
+
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-3">
+                      Appuyer sur 3 pour
+
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-line">
+                        <ng-select formControlName="tb_action_AHO_3" (change)="showTransferNumberHoliday($event,'3')">
+                          <ng-option *ngFor="let action of listAction"
+                            [value]="action['value']">{{action['name']}}</ng-option>
+                        </ng-select>
+
+                      </div>
+                    </div>
+                    <div class="col-md-5" style="padding-bottom:0;" *ngIf="transferNumber_H_3">
+                      <div class="input-group-tous">
+                        <span class="input-group-addon">
+                          <!-- Numéro de téléphone -->
+                        </span>
+                        <div class="form-line">
+
+                          <ng-select placeholder="Numéro de téléphone ou poste"
+                            formControlName="tb_transferNumber_AHO_3" [searchFn]="startsWithSearchFn">
+                            <ng-option *ngFor="let num of numberPhoneTransfert"
+                              [value]="num['phoneNumber'] != null ? num['phoneNumber'] : num['extension']">{{num['owner']['firstName']}}
+                              {{num['owner']['lastName']}} ({{num['phoneNumber']}}<span
+                                *ngIf="num['phoneNumber'] != null">,</span> Ext {{num['extension']}})
+                            </ng-option>
+                          </ng-select>
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-3">
+                      Appuyer sur 4 pour
+
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-line">
+                        <ng-select formControlName="tb_action_AHO_4" (change)="showTransferNumberHoliday($event,'4')">
+                          <ng-option *ngFor="let action of listAction"
+                            [value]="action['value']">{{action['name']}}</ng-option>
+                        </ng-select>
+                      </div>
+                    </div>
+                    <div class="col-md-5" style="padding-bottom:0;" *ngIf="transferNumber_H_4">
+                      <div class="input-group-tous">
+                        <span class="input-group-addon">
+                          <!-- Numéro de téléphone -->
+                        </span>
+                        <div class="form-line">
+
+                          <ng-select placeholder="Numéro de téléphone ou poste"
+                            formControlName="tb_transferNumber_AHO_4" [searchFn]="startsWithSearchFn">
+                            <ng-option *ngFor="let num of numberPhoneTransfert"
+                              [value]="num['phoneNumber'] != null ? num['phoneNumber'] : num['extension']">{{num['owner']['firstName']}}
+                              {{num['owner']['lastName']}} ({{num['phoneNumber']}}<span
+                                *ngIf="num['phoneNumber'] != null">,</span> Ext {{num['extension']}})
+                            </ng-option>
+                          </ng-select>
+
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-3">
+                      Appuyer sur 5 pour
+
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-line">
+                        <ng-select formControlName="tb_action_AHO_5" (change)="showTransferNumberHoliday($event,'5')">
+                          <ng-option *ngFor="let action of listAction"
+                            [value]="action['value']">{{action['name']}}</ng-option>
+                        </ng-select>
+                      </div>
+                    </div>
+                    <div class="col-md-5" style="padding-bottom:0;" *ngIf="transferNumber_H_5">
+                      <div class="input-group-tous">
+                        <span class="input-group-addon">
+                          <!-- Numéro de téléphone -->
+                        </span>
+                        <div class="form-line">
+
+                          <ng-select placeholder="Numéro de téléphone ou poste"
+                            formControlName="tb_transferNumber_AHO_5" [searchFn]="startsWithSearchFn">
+                            <ng-option *ngFor="let num of numberPhoneTransfert"
+                              [value]="num['phoneNumber'] != null ? num['phoneNumber'] : num['extension']">{{num['owner']['firstName']}}
+                              {{num['owner']['lastName']}} ({{num['phoneNumber']}}<span
+                                *ngIf="num['phoneNumber'] != null">,</span> Ext {{num['extension']}})
+                            </ng-option>
+                          </ng-select>
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-3">
+                      Appuyer sur 6 pour
+
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-line">
+                        <ng-select formControlName="tb_action_AHO_6" (change)="showTransferNumberHoliday($event,'6')">
+                          <ng-option *ngFor="let action of listAction"
+                            [value]="action['value']">{{action['name']}}</ng-option>
+                        </ng-select>
+                      </div>
+                    </div>
+                    <div class="col-md-5" style="padding-bottom:0;" *ngIf="transferNumber_H_6">
+                      <div class="input-group-tous">
+                        <span class="input-group-addon">
+                          <!-- Numéro de téléphone -->
+                        </span>
+                        <div class="form-line">
+
+                          <ng-select placeholder="Numéro de téléphone ou poste"
+                            formControlName="tb_transferNumber_AHO_6" [searchFn]="startsWithSearchFn">
+                            <ng-option *ngFor="let num of numberPhoneTransfert"
+                              [value]="num['phoneNumber'] != null ? num['phoneNumber'] : num['extension']">{{num['owner']['firstName']}}
+                              {{num['owner']['lastName']}} ({{num['phoneNumber']}}<span
+                                *ngIf="num['phoneNumber'] != null">,</span> Ext {{num['extension']}})
+                            </ng-option>
+                          </ng-select>
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-3">
+                      Appuyer sur 7 pour
+
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-line">
+                        <ng-select formControlName="tb_action_AHO_7" (change)="showTransferNumberHoliday($event,'7')">
+                          <ng-option *ngFor="let action of listAction"
+                            [value]="action['value']">{{action['name']}}</ng-option>
+                        </ng-select>
+                      </div>
+                    </div>
+                    <div class="col-md-5" style="padding-bottom:0;" *ngIf="transferNumber_H_7">
+                      <div class="input-group-tous">
+                        <span class="input-group-addon">
+                          <!-- Numéro de téléphone -->
+                        </span>
+                        <div class="form-line">
+
+                          <ng-select placeholder="Numéro de téléphone ou poste"
+                            formControlName="tb_transferNumber_AHO_7" [searchFn]="startsWithSearchFn">
+                            <ng-option *ngFor="let num of numberPhoneTransfert"
+                              [value]="num['phoneNumber'] != null ? num['phoneNumber'] : num['extension']">{{num['owner']['firstName']}}
+                              {{num['owner']['lastName']}} ({{num['phoneNumber']}}<span
+                                *ngIf="num['phoneNumber'] != null">,</span> Ext {{num['extension']}})
+                            </ng-option>
+                          </ng-select>
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-3">
+                      Appuyer sur 8 pour
+
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-line">
+                        <ng-select formControlName="tb_action_AHO_8" (change)="showTransferNumberHoliday($event,'8')">
+                          <ng-option *ngFor="let action of listAction"
+                            [value]="action['value']">{{action['name']}}</ng-option>
+                        </ng-select>
+                      </div>
+                    </div>
+                    <div class="col-md-5" style="padding-bottom:0;" *ngIf="transferNumber_H_8">
+                      <div class="input-group-tous">
+                        <span class="input-group-addon">
+                          <!-- Numéro de téléphone -->
+                        </span>
+                        <div class="form-line">
+
+                          <ng-select placeholder="Numéro de téléphone ou poste"
+                            formControlName="tb_transferNumber_AHO_8" [searchFn]="startsWithSearchFn">
+                            <ng-option *ngFor="let num of numberPhoneTransfert"
+                              [value]="num['phoneNumber'] != null ? num['phoneNumber'] : num['extension']">{{num['owner']['firstName']}}
+                              {{num['owner']['lastName']}} ({{num['phoneNumber']}}<span
+                                *ngIf="num['phoneNumber'] != null">,</span> Ext {{num['extension']}})
+                            </ng-option>
+                          </ng-select>
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-3">
+                      Appuyer sur 9 pour
+
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-line">
+                        <ng-select formControlName="tb_action_AHO_9" (change)="showTransferNumberHoliday($event,'9')">
+                          <ng-option *ngFor="let action of listAction"
+                            [value]="action['value']">{{action['name']}}</ng-option>
+                        </ng-select>
+                      </div>
+                    </div>
+                    <div class="col-md-5" style="padding-bottom:0;" *ngIf="transferNumber_H_9">
+                      <div class="input-group-tous">
+                        <span class="input-group-addon">
+                          <!-- Numéro de téléphone -->
+                        </span>
+                        <div class="form-line">
+
+                          <ng-select placeholder="Numéro de téléphone ou poste"
+                            formControlName="tb_transferNumber_AHO_9" [searchFn]="startsWithSearchFn">
+                            <ng-option *ngFor="let num of numberPhoneTransfert"
+                              [value]="num['phoneNumber'] != null ? num['phoneNumber'] : num['extension']">{{num['owner']['firstName']}}
+                              {{num['owner']['lastName']}} ({{num['phoneNumber']}}<span
+                                *ngIf="num['phoneNumber'] != null">,</span> Ext {{num['extension']}})
+                            </ng-option>
+                          </ng-select>
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-3">
+                      Appuyer sur * pour
+
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-line">
+                        <ng-select formControlName="tb_action_AHO_etoile"
+                          (change)="showTransferNumberHoliday($event,'*')">
+                          <ng-option *ngFor="let action of listAction"
+                            [value]="action['value']">{{action['name']}}</ng-option>
+                        </ng-select>
+                      </div>
+                    </div>
+                    <div class="col-md-5" style="padding-bottom:0;" *ngIf="transferNumber_H_etoile">
+                      <div class="input-group-tous">
+                        <span class="input-group-addon">
+                          <!-- Numéro de téléphone -->
+                        </span>
+                        <div class="form-line">
+
+                          <ng-select placeholder="Numéro de téléphone ou poste"
+                            formControlName="tb_transferNumber_AHO_etoile" [searchFn]="startsWithSearchFn">
+                            <ng-option *ngFor="let num of numberPhoneTransfert"
+                              [value]="num['phoneNumber'] != null ? num['phoneNumber'] : num['extension']">{{num['owner']['firstName']}}
+                              {{num['owner']['lastName']}} ({{num['phoneNumber']}}<span
+                                *ngIf="num['phoneNumber'] != null">,</span> Ext {{num['extension']}})
+                            </ng-option>
+                          </ng-select>
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-3">
+                      Appuyer sur # pour
+
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-line">
+                        <ng-select formControlName="tb_action_AHO_diese"
+                          (change)="showTransferNumberHoliday($event,'#')">
+                          <ng-option *ngFor="let action of listAction"
+                            [value]="action['value']">{{action['name']}}</ng-option>
+                        </ng-select>
+                      </div>
+                    </div>
+                    <div class="col-md-5" style="padding-bottom:0;" *ngIf="transferNumber_H_diese">
+                      <div class="input-group-tous">
+                        <span class="input-group-addon">
+                          <!-- Numéro de téléphone -->
+                        </span>
+                        <div class="form-line">
+
+                          <ng-select placeholder="Numéro de téléphone ou poste"
+                            formControlName="tb_transferNumber_AHO_diese" [searchFn]="startsWithSearchFn">
+                            <ng-option *ngFor="let num of numberPhoneTransfert"
+                              [value]="num['phoneNumber'] != null ? num['phoneNumber'] : num['extension']">{{num['owner']['firstName']}}
+                              {{num['owner']['lastName']}} ({{num['phoneNumber']}}<span
+                                *ngIf="num['phoneNumber'] != null">,</span> Ext {{num['extension']}})
+                            </ng-option>
+                          </ng-select>
+
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+
+
+
+                </mat-tab>
+
+              </mat-tab-group>
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12" style="margin: 15px 0 15px 0; padding: 0; ">
+      <div id="accordionEmplacement" class="accordion">
+        <div class="card">
+          <div class="card-header">
+            <span class="Title">
+              <i class="glyphicon glyphicon-hdd"></i>
+              Message de bienvenue
+            </span>
+          </div>
+          <div id="collapseEmplacement" class="collapse show" data-parent="#accordionEmplacement">
+            <div class="card-body">
+              <mat-tab-group>
+                <mat-tab label="Heures ouvrable">
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-12">
+                      Message d'accueil pendant les heures ouvrables <br />
+
+                      C’est le message que vos clients entendent lorsqu’ils appellent le standard automatique pendant
+                      les heures ouvrables. Les messages d’accueil comportent souvent un court message de bienvenue et
+                      énumèrent les options du menu.
+                    </div>
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-12">
+                      <span class="input-group-addon">
+
+                      </span>
+
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" style="cursor: pointer;" value="DEFAULT"
+                          id="businessGreetingType1" formControlName="tb_businessGreetingType" checked>
+                        <label class="form-check-label" style="cursor: pointer;" for="businessGreetingType1">Message de
+                          bienvenue par défaut</label>
+                      </div>
+                      <!-- <div class="form-check">
+                        <input class="form-check-input" style="cursor: pointer;" type="radio" id="businessGreetingType2"
+                          value="CUSTOM" formControlName="tb_businessGreetingType">
+                        <label class="form-check-label" style="cursor: pointer;" for="businessGreetingType2">Message de
+                          bienvenue personnalisé</label>
+                      </div> -->
+
+                    </div>
+
+                  </div>
+                </mat-tab>
+                <mat-tab label="Après les heures ouvrables">
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-12">
+                      Message d'accueil après les heures ouvrables <br />
+
+                      C’est le message que vos clients entendent lorsqu’ils appellent le standard automatique après les
+                      heures ouvrables. Les messages d’accueil comportent souvent un court message de bienvenue et
+                      énumèrent les options du menu. Le menu que vous avez défini pour le service après les heures
+                      ouvrables s’applique également au calendrier des vacances. </div>
+                  </div>
+                  <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+                    <div class="col-lg-12">
+                      <span class="input-group-addon">
+
+                      </span>
+
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" style="cursor: pointer;" value="DEFAULT"
+                          id="afterGreetingType1" formControlName="tb_afterGreetingType" checked>
+                        <label class="form-check-label" style="cursor: pointer;" for="afterGreetingType1">Message de
+                          bienvenue par défaut</label>
+                      </div>
+                      <!-- <div class="form-check">
+                        <input class="form-check-input" style="cursor: pointer;" type="radio" id="afterGreetingType2"
+                          value="CUSTOM" formControlName="tb_afterGreetingType">
+                        <label class="form-check-label" style="cursor: pointer;" for="afterGreetingType2">Message de
+                          bienvenue personnalisé</label>
+                      </div> -->
+
+                    </div>
+
+                  </div>
+                </mat-tab>
+              </mat-tab-group>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12" style="text-align: end;">
+      <div class="row">
+        <div class="col-md-12">
+          <button type="reset" style="margin-right: 15px;" class="btn btn-danger btn-xl"
+            (click)="close()">Annuler</button>
+          <button type="submit" style="margin-right: 15px;" class="btn btn-primary btn-xl">Ajouter</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

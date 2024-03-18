@@ -1,0 +1,390 @@
+<app-loader *ngIf="loading" [TextValue]="TextValue"></app-loader>
+<form [formGroup]="registerForm" (ngSubmit)="onSubmit()" *ngIf="registerForm">
+  <div class="row Info">
+    <div class="col-md-12">
+      <div id="accordionInfoClient" class="accordion">
+        <div class="card">
+          <div class="card-header">
+            <span class="Title">
+              <i class="glyphicon glyphicon-hdd"></i>
+              Informations sur le client actif
+            </span>
+            <!-- <a class="card-link" data-toggle="collapse" href="#collapseInfoClient">
+              <div class="pull-right">
+                <span (click)="chevron($event)" class="fa fa-chevron-down"></span>
+              </div>
+            </a> -->
+          </div>
+          <div class="d-flex justify-content-center" *ngIf="entID != '' && !approvisionnementEncours">
+            <div class="text-primary">
+              <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              Le provsionning peut prendre jusqu'à 3 minutes, vous pouvez patienter ou fermer cette fenêtre et revenir plus tard pour continuer le paramétrage
+            </div>
+          </div>
+          <div id="collapseInfoClient" class="collapse show" data-parent="#accordionInfoClient">
+            <div class="card-body">
+              <div class="row" style="width: 100%; margin: 0; padding-bottom: 15px; ">
+                <div class="row g-3">
+                  <div class="col-md-6" style="padding-bottom:0;">
+                    <div class="input-group-tous">
+                      <span class="input-group-addon">
+                        Code Client (*)
+                      </span>
+                      <div class="form-line">
+                        <input [ngClass]="{'is-invalid': submitted && f['tb_code_client'].errors }" readonly
+                          formControlName="tb_code_client" class="form-control" type="text" value="{{code_client}}">
+                        <div *ngIf="submitted && f['tb_code_client'].errors" class="invalid-feedback">
+                          <div *ngIf="f['tb_code_client'].errors['required']">
+                            Il faut saisir un code client valide.
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6" style="padding-bottom:0;">
+                    <div class="input-group-tous">
+                      <span class="input-group-addon">
+                        Nom (*)
+                      </span>
+                      <div class="form-line">
+                        <input [ngClass]="{'is-invalid': submitted && f['tb_nom_client'].errors }"
+                          formControlName="tb_nom_client" class="form-control" type="text" [readonly]="isModif">
+                        <div *ngIf="submitted && f['tb_nom_client'].errors" class="invalid-feedback">
+                          <div *ngIf="f['tb_nom_client'].errors['required']">
+                            Il faut saisir un nom valide.
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row g-3 infoIp">
+                  <div class="col-md-12" style="padding-bottom:0;">
+                    <div class="input-group-tous">
+                      <span class="input-group-addon">
+                        E-mail (*)
+                      </span>
+                      <div class="form-line">
+                        <input [ngClass]="{'is-invalid': submitted && f['tb_email'].errors }" formControlName="tb_email"
+                          class="form-control" type="text" [readonly]="isModif">
+                        <div *ngIf="submitted && f['tb_email'].errors" class="invalid-feedback">
+                          <div *ngIf="f['tb_email'].errors['required']">
+                            Il faut saisir une email.
+                          </div>
+                          <div class="input_profile_notation" *ngIf="f['tb_email'].errors['email']">Assurez-vous une
+                            forme valide </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row g-3 infoIp">
+                  <div class="col-md-12" style="padding-bottom:0;">
+                   
+                    <div class="input-group-tous">
+                      <span class="input-group-addon">
+                        Services (*) <span *ngIf="entID != '' && entID != null"> <i class="fa fa-exclamation-triangle" aria-hidden="true" style="color: darkorange ;" title="L’emplacement du siège social est spécifique à un pack, et ne sera plus enregistré si le pack est désélectionné.Pour éviter de saisir le même emplacement plusieurs fois, nous vous recommandons d’ajouter d’abord des packs et d’enregistrer les modifications, puis de supprimer des packs et d’enregistrer ces modifications."></i></span>
+                        
+                      </span>
+                      <div class="form-line">
+                        <ng-select formControlName="lst_packages" name="Services" [multiple]="true"
+                          (change)="checkService($event)"
+                          [ngClass]="{'is-invalid': submitted && f['lst_packages'].errors }" required>
+                          <ng-option *ngFor="let service of services"
+                            [value]="service['libelleByEnglish']" [disabled]="service['disabled']" >
+                            {{service['libelle']}}   <span *ngIf="service['approvisionnement'] != null" style="color: green;">{{service['approvisionnement']}}</span>
+            
+                          </ng-option>
+                          <ng-template ng-header-tmp *ngIf="entID==null || entID == ''">
+
+                            <div>
+                              <button type="button" class="btn btn-link" (click)="onSelectAllPackages()"
+                                style="color: rgb(235, 103, 27);">Sélectionner
+                                tous</button>
+                            </div>
+
+                          </ng-template>
+                        </ng-select>
+                        <div *ngIf="submitted && f['lst_packages'].errors" class="invalid-feedback">
+                          <div *ngIf="f['lst_packages'].errors['required']">
+                            Il faut choisir au moins un service.
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12">
+      <div id="accordionInfoClient" class="accordion">
+        <div class="card">
+          <div class="card-header">
+            <span class="Title">
+              <i class="glyphicon glyphicon-hdd"></i>
+              Adresse
+            </span>
+            <!-- <a class="card-link" data-toggle="collapse" href="#collapseInfoClient">
+              <div class="pull-right">
+                <span (click)="chevron($event)" class="fa fa-chevron-down"></span>
+              </div>
+            </a> -->
+          </div>
+          <div id="collapseInfoClient" class="collapse show" data-parent="#accordionInfoClient">
+            <div class="card-body">
+              <div class="row" style="width: 100%; margin: 0; padding-bottom: 0; ">
+                <div class="row g-3 infoIp">
+                </div>
+                <div class="row g-3 infoIp">
+                  <div class="col-md-6" style="padding-bottom:0;">
+                    <div class="input-group-tous">
+                      <span class="input-group-addon">
+                        Adresse (*)
+                      </span>
+                      <div class="form-line">
+                        <input [ngClass]="{'is-invalid': submitted && f['tb_adresseLigne1'].errors }"
+                          formControlName="tb_adresseLigne1" class="form-control" type="text"><br />
+                        <div *ngIf="submitted && f['tb_adresseLigne1'].errors" class="invalid-feedback">
+                          <div *ngIf="f['tb_adresseLigne1'].errors['required']">
+                            Il faut saisir l'adresse.
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6" style="padding-bottom:0;">
+                    <div class="input-group-tous">
+                      <span class="input-group-addon">
+                        Complément adresse
+                      </span>
+                      <div class="form-line">
+                        <input formControlName="tb_adresseLigne2" class="form-control" type="text">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row g-3 infoIp">
+                  <div class="col-md-6" style="padding-bottom:0;">
+                    <div class="input-group-tous">
+                      <span class="input-group-addon">
+                        Code postal (*)
+                      </span>
+                      <div class="form-line">
+                        <input formControlName="tb_code_postale"
+                          [ngClass]="{'is-invalid': submitted && f['tb_code_postale'].errors }" class="form-control"
+                          type="text" (keypress)="CodePostalControl($event,f['tb_code_postale'])"><br />
+                        <div *ngIf="submitted && f['tb_code_postale'].errors" class="invalid-feedback">
+                          <div *ngIf="f['tb_code_postale'].errors['required']">
+                            Il faut saisir le code postal.
+                          </div>
+                          <div *ngIf="f['tb_code_postale'].errors['minlength']">La longueur ne peut pas être inférieure
+                            à 5
+                          </div>
+                          <div *ngIf="f['tb_code_postale'].errors['maxlength']">La longueur ne peut pas être supérieure
+                            à 5
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6" style="padding-bottom:0;">
+                    <div class="input-group-tous">
+                      <span class="input-group-addon">
+                        Ville (*)
+                      </span>
+                      <div class="form-line">
+                        <input [ngClass]="{'is-invalid': submitted && f['tb_ville'].errors }" formControlName="tb_ville"
+                          class="form-control" type="text"><br />
+
+                        <div *ngIf="submitted && f['tb_ville'].errors" class="invalid-feedback">
+                          <div *ngIf="f['tb_ville'].errors['required']">
+                            Il faut saisir la ville.
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12" *ngIf="showHiddenSite">
+      <div id="accordionEmplacement" class="accordion">
+        <div class="card">
+          <div class="card-header">
+            <span class="Title">
+              <i class="glyphicon glyphicon-hdd"></i>
+              Site principal
+            </span>
+            <!-- <a class="card-link" data-toggle="collapse" href="#collapseEmplacement">
+              <div class="pull-right">
+                <span (click)="chevron($event)" class="fa fa-chevron-down"></span>
+              </div>
+            </a> -->
+          </div>
+          <div id="collapseEmplacement" class="collapse show" data-parent="#accordionEmplacement">
+            <div class="card-body">
+              <div class="row" style="width: 100%; margin: 0; padding-bottom: 15px; ">
+                <div class="row g-3 info">
+                </div>
+                <div class="row g-3 info">
+                  <div class="col-md-12" style="padding-bottom:0;">
+                    <div class="input-group-tous">
+                      <span class="input-group-addon">
+                        Nom du site (*)
+                      </span>
+                      <div class="form-line">
+                        <input [ngClass]="{'is-invalid': submitted && f['tb_name_site'].errors }"
+                          formControlName="tb_name_site" class="form-control" type="text">
+                        <div *ngIf="submitted && f['tb_name_site'].errors" class="invalid-feedback">
+                          <div *ngIf="f['tb_name_site'].errors['required']">
+                            Il faut saisir le nom du site.
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row g-3 infoIp">
+                  <div class="col-md-6" style="padding-bottom:0;">
+                 
+                    <div class="input-group-tous">
+                      <span class="input-group-addon">
+                        Adresse du site(*)
+                      </span>
+                      <div class="form-line">
+                        <input [ngClass]="{'is-invalid': submitted && f['tb_adresseLigne1_site'].errors }" formControlName="tb_adresseLigne1_site" class="form-control" type="text">
+                        <div *ngIf="submitted && f['tb_adresseLigne1_site'].errors" class="invalid-feedback">
+                          <div *ngIf="f['tb_adresseLigne1_site'].errors['required']">
+                            Il faut saisir l'adresse du site.
+                          </div> 
+                        </div>
+  
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6" style="padding-bottom:0;">
+                    
+                    <div class="input-group-tous">
+                      <span class="input-group-addon">
+                        Complément adresse du site
+                      </span>
+                      <div class="form-line">
+                        <input formControlName="tb_adresseLigne2_site" class="form-control" type="text">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+  
+                <div class="row g-3 infoIp">
+                  <div class="col-md-6" style="padding-bottom:0;">
+                    <div class="input-group-tous">
+                      <span class="input-group-addon">
+                        Code postal du site (*)
+                      </span>
+                      <div class="form-line">
+                        <input [ngClass]="{'is-invalid': submitted && f['tb_code_postale_site'].errors }"  class="form-control" type="text" formControlName="tb_code_postale_site" (keypress)="CodePostalControl($event,f['tb_code_postale_site'])">
+                        <div *ngIf="submitted && f['tb_code_postale_site'].errors" class="invalid-feedback">
+                          <div *ngIf="f['tb_code_postale_site'].errors['required']">
+                            Il faut saisir le code postal du site.
+                          </div> 
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6" style="padding-bottom:0;">
+                   
+                    <div class="input-group-tous">
+                      <span class="input-group-addon">
+                        Ville du site (*)
+                      </span>
+                      <div class="form-line">
+                        <input [ngClass]="{'is-invalid': submitted && f['tb_ville_site'].errors }" formControlName="tb_ville_site" class="form-control" type="text">
+  
+  
+                        <div *ngIf="submitted && f['tb_ville_site'].errors" class="invalid-feedback">
+                          <div *ngIf="f['tb_ville_site'].errors['required']">
+                            Il faut saisir la ville du site.
+                          </div> 
+                        </div>
+  
+                      </div>
+                    </div>
+                  </div>
+                 
+                </div>
+              
+                <div class="row g-3 infoIp">
+                  <div class="col-md-12" style="padding-bottom:0;">
+                    <div class="input-group-tous">
+                      <span class="input-group-addon">
+                        Numéros de téléphone
+                      </span>
+                      <div *ngFor="let num of numeros" style="justify-content: space-between">
+                        <span style="background-color:rgb(215, 238, 250) ; cursor: pointer;"> {{num}}
+                          <i (click)="elemineNumbe(num)" class="fa fa-times" aria-hidden="true"
+                            style="font-size: 12px;"></i>
+                        </span>
+                      </div>
+                      <div class="form-line">
+                        <input type="text" (keyup)="numberControlSepare($event,f['tb_lst_numbers_site'])" (keypress)="numberControlSepare($event,f['tb_lst_numbers_site'])" formControlName="tb_lst_numbers_site"
+                          id="message" class="form-control"
+                          placeholder="Saisissez les numéros de téléphone séparés par des virgules">
+                          <div *ngIf="!validNumber">
+                              <span style="color: red;">Le numéro de téléphone doit commencer par +33 et doit comporter 12 caractères</span>
+                        
+                          </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12">
+      <div class="row">
+        <div class="col-md-12">
+          <button *ngIf="entreprise == null" (click)="SetEvent('Add')" style="margin-right: 15px;"
+            class="btn btn-primary btn-xl">Créer Client</button>
+          <button *ngIf="entreprise != null" (click)="SetEvent('Edit')" class="btn btn-success btn-xl"
+            style="margin-right: 15px;" [disabled]="!approvisionnementEncours">Enregistrer Modification</button>
+          <button type="reset" *ngIf="entreprise != null" (click)="DeleteEntreprise()" class="btn btn-danger btn-xl"
+               
+              style="margin-right: 15px;" [disabled]="!approvisionnementEncours">Supprimer</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</form>
+<!-- Modal Delete Entreprise -->
+<div class="modal fade" id="myModalDeleteEntreprise" tabindex="-1" aria-labelledby="exampleModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5>Supprimer Client</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p> Êtes-vous sûr(e) de vouloir supprimer <b *ngIf="entreprise != null">{{entreprise.name}}</b>? </p>
+      </div>
+      <div class="modal-footer">
+        <button type="reset" class="btn btn-danger" data-bs-dismiss="modal" #closeModalDelete
+          (click)="annulerSupprime()">Annuler</button>
+        <button type="button" class="btn btn-primary" (click)="ConfirmedDeleteEntreprise()">Supprimer</button>
+      </div>
+    </div>
+  </div>
+</div>

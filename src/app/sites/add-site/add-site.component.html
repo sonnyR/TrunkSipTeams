@@ -1,0 +1,95 @@
+<form [formGroup]="registerSiteForm" (ngSubmit)="onSubmit(registerSiteForm, formDirective)" #formDirective="ngForm">
+  <div class="row" style="width: 100%; margin: 15px 0 0 0; padding-bottom: 15px; ">
+    <div class="row g-3 infoIp">
+      <div class="col-md-4" style="padding-bottom:0;">
+        <div class="input-group-tous">
+          <span class="input-group-addon">
+            Nom du site (*)
+          </span>
+          <div class="form-line">
+            <input [ngClass]="{'is-invalid': submitted && f['tb_name'].errors }" formControlName="tb_name"
+              class="form-control" type="text">
+            <div *ngIf="submitted && f['tb_name'].errors" class="invalid-feedback">
+              <div *ngIf="f['tb_name'].errors['required']">
+                Il faut saisir un nom du site.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4" style="padding-bottom:0;">
+        <div class="input-group-tous">
+          <span class="input-group-addon">
+            Adresse (*)
+          </span>
+          <div class="form-line">
+            <input [ngClass]="{'is-invalid': submitted && f['tb_address1'].errors }" formControlName="tb_address1"
+              class="form-control" type="text">
+            <div *ngIf="submitted && f['tb_address1'].errors" class="invalid-feedback">
+              <div *ngIf="f['tb_address1'].errors['required']">
+                Il faut saisir l'adresse du site.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4" style="padding-bottom:0;">
+        <div class="input-group-tous">
+          <span class="input-group-addon">
+            Complément adresse
+          </span>
+          <div class="form-line">
+            <input formControlName="tb_address2" class="form-control" type="text">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row g-3 infoIp">
+      <div class="col-md-6" style="padding-bottom:0;">
+        <div class="input-group-tous">
+          <span class="input-group-addon">
+            Code postal (*)
+          </span>
+          <div class="form-line">
+            <input [ngClass]="{'is-invalid': submitted && f['tb_codePostal'].errors }" formControlName="tb_codePostal"
+              class="form-control" type="text" (keypress)="CodePostalControl($event,f['tb_codePostal'])">
+            <div *ngIf="submitted && f['tb_codePostal'].errors" class="invalid-feedback">
+              <div *ngIf="f['tb_codePostal'].errors['required']">
+                Il faut saisir le code postal.
+              </div>
+              <div *ngIf="f['tb_codePostal'].errors['minlength']">La longueur ne peut pas être inférieure à 5
+              </div>
+              <div *ngIf="f['tb_codePostal'].errors['maxlength']">La longueur ne peut pas être supérieure à 5
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6" style="padding-bottom:0;">
+        <div class="input-group-tous">
+          <span class="input-group-addon">
+            Ville (*)
+          </span>
+          <div class="form-line">
+            <input [ngClass]="{'is-invalid': submitted && f['tb_city'].errors }" formControlName="tb_city"
+              class="form-control" type="text">
+            <div *ngIf="submitted && f['tb_city'].errors" class="invalid-feedback">
+              <div *ngIf="f['tb_city'].errors['required']">
+                Il faut saisir la ville.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-12">
+    <div class="row">
+      <div class="col-md-12">
+        <button style="margin-right: 15px;" class="btn btn-primary btn-xl">Enregistrer Site</button>
+        <button type="reset" class="btn btn-danger btn-xl" style="margin-right: 15px;"
+          (click)=onReset()>Annuler</button>
+      </div>
+    </div>
+  </div>
+</form>

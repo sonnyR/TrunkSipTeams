@@ -1,0 +1,190 @@
+<app-loader *ngIf="loading" [TextValue]="TextValue"></app-loader>
+<div class="modal-header">
+  <h5 class="modal-title">Ajouter un utilisateur et attribuer le pack Wholesale</h5>
+  <button type="button" (click)="close()" class="close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <form [formGroup]="registerUserForm" (ngSubmit)="onSubmit()">
+    <div class="row infoIp" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+      <div class="col-md-6" style="padding-bottom:0;">
+        <div class="input-group-tous">
+          <span class="input-group-addon">
+            Prénom (*)
+          </span>
+          <div class="form-line">
+            <input [ngClass]="{'is-invalid': submitted && f['tb_prenom'].errors }" formControlName="tb_prenom"
+              class="form-control" type="text">
+            <div *ngIf="submitted && f['tb_prenom'].errors" class="invalid-feedback">
+              <div *ngIf="f['tb_prenom'].errors['required']">
+                Il faut saisir le prénom.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6" style="padding-bottom:0;">
+        <div class="input-group-tous">
+          <span class="input-group-addon">
+            Nom (*)
+          </span>
+          <div class="form-line">
+            <input [ngClass]="{'is-invalid': submitted && f['tb_nom'].errors }" formControlName="tb_nom"
+              class="form-control" type="text">
+            <div *ngIf="submitted && f['tb_nom'].errors" class="invalid-feedback">
+              <div *ngIf="f['tb_nom'].errors['required']">
+                Il faut saisir le nom.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row infoIp" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+      <div class="col-md-12" style="padding-bottom:0;">
+        <div class="input-group-tous">
+          <span class="input-group-addon">
+            Email (*)
+          </span>
+          <div class="form-line">
+            <input [ngClass]="{'is-invalid': submitted && f['tb_email'].errors }" formControlName="tb_email"
+              class="form-control" type="text">
+            <div *ngIf="submitted && f['tb_email'].errors" class="invalid-feedback">
+              <div *ngIf="f['tb_email'].errors['required']">
+                Il faut saisir l'email.
+              </div>
+              <div class="input_profile_notation" *ngIf="f['tb_email'].errors['email']">Assurez-vous une forme valide
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row infoIp" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+      <div class="col-md-12" style="padding-bottom:0;">
+        <div class="input-group-tous">
+          <span class="input-group-addon">
+            Service
+          </span>
+          <div class="form-line">
+            <ng-select name="Service" [ngClass]="{'is-invalid': submitted && f['tb_service'].errors }"
+              formControlName="tb_service" required (change)="changePackage($event)">
+              <ng-option value="Aucun">Aucun</ng-option>
+              <ng-option *ngFor="let serv of dropdownListServices" [value]="serv.value">{{serv.name}}</ng-option>
+            </ng-select>
+            <div *ngIf="submitted && f['tb_service'].errors" class="invalid-feedback">
+              <div *ngIf="f['tb_service'].errors['required']">
+                Il faut saisir un service.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row infoIp" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+      <div class="col-md-12" style="padding-bottom:0;" *ngIf="showChampIdLocation">
+        <div class="input-group-tous">
+          <span class="input-group-addon">
+            Site (*)
+          </span>
+          <div class="form-line">
+            <ng-select name="Service" [ngClass]="{'is-invalid': submitted && f['tb_site'].errors }"
+              formControlName="tb_site" (change)="getPhoneNumbersLocation($event)" [loading]=loadingPeople loadingText='Chargement...'>
+              <ng-option *ngFor="let site of sites" [value]="site.id">{{site.name}}</ng-option>
+            </ng-select>
+            <div *ngIf="submitted && f['tb_site'].errors" class="invalid-feedback">
+              <div *ngIf="f['tb_site'].errors['required']">
+                Il faut saisir le site.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+ 
+    </div>
+    <div class="row infoIp" style="width: 100%; margin: 15px 0 15px 0; padding: 0; " *ngIf="showChampIdLocation">
+     
+     
+      <div class="col-md-6" style="padding-bottom:0;" *ngIf="showChampNumbers">
+        <div class="input-group-tous">
+          <span class="input-group-addon">
+            Numéro de téléphone
+          </span>
+          <div class="form-line">
+            <ng-select [ngClass]="{'is-invalid': submitted && f['tb_numTelephone'].errors }"
+              formControlName="tb_numTelephone" (change)="setExtensionOblige($event)">
+              <ng-option value="">Aucun</ng-option>
+              <ng-option *ngFor="let num of numbersPhone"
+                [value]="num['phoneNumber']">{{num['phoneNumber']}}</ng-option>
+            </ng-select>
+            <div *ngIf="submitted && f['tb_numTelephone'].errors" class="invalid-feedback">
+              <div *ngIf="f['tb_numTelephone'].errors['required']">
+                Il faut saisir le numéro téléphonique.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- <div class="col-md-2" style="padding-bottom:0;" *ngIf="showChampNumbers">
+        <div class="input-group-tous">
+          <span class="input-group-addon">
+           
+          </span>
+          <div class="form-line">
+           et/ou
+          </div>
+        </div>
+      </div> -->
+
+      <div class="col-md-6" style="padding-bottom:0;" *ngIf="showChampIdLocation">
+        <div class="input-group-tous">
+          <span class="input-group-addon">
+            Extension <span *ngIf="obligatoireExtension">(*)</span>
+          </span>
+          <div class="form-line">
+            <input [ngClass]="{'is-invalid': submitted && f['tb_extension'].errors }" formControlName="tb_extension"
+              class="form-control" type="text" placeholder="Saisissez un numéro de deux à six chiffres"
+              (keypress)="extensionControl($event,f['tb_extension'])">
+            <div *ngIf="submitted && f['tb_extension'].errors" class="invalid-feedback">
+              <div *ngIf="f['tb_extension'].errors['minlength']">La longueur ne peut pas être inférieure à 2
+              </div>
+              <div *ngIf="f['tb_extension'].errors['maxlength']">La longueur ne peut pas être supérieure à 6
+              </div>
+              <div *ngIf="f['tb_extension'].errors['pattern']">Doit saisir des chiffres
+              </div>
+              <div *ngIf="f['tb_extension'].errors['required']">
+                Il faut saisir l'extension car le champ <b>numéro de téléphone</b>  est vide
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- <div class="row infoIp" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+      <div class="col-md-6" style="padding-bottom:0;">
+        <div class="input-group-tous">
+          <span class="input-group-addon">
+            Role
+          </span>
+          <div class="form-line">
+            <ng-select name="Service"
+              formControlName="tb_role">
+              <ng-option *ngFor="let role of roles" [value]="role.id">{{role.name}}</ng-option>
+            </ng-select>
+          </div>
+        </div>
+      </div>
+    
+    </div> -->
+    <div class="col-md-12" style="text-align: end;">
+      <div class="row">
+        <div class="col-md-12">
+          <button type="reset" class="btn btn-danger btn-xl" style="margin-right: 15px;"
+            (click)="close()">Annuler</button>
+          <button type="submit" style="margin-right: 15px;" class="btn btn-primary btn-xl">Enrégistrer</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

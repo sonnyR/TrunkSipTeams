@@ -1,0 +1,143 @@
+<form [formGroup]="registerVoicePortalForm" (ngSubmit)="onSubmit()" #formDirective="ngForm">
+    <div class="row" style="width: 100%; margin: 15px 0 0 0; padding-bottom: 15px; ">
+      <div class="row g-3 infoIp">
+        <div class="col-md-4" style="padding-bottom:0;">
+          <div class="input-group-tous">
+            <span class="input-group-addon">
+            Nom du portail vocal (*)
+            </span>
+            <div class="form-line">
+              <input formControlName="tb_Name" [ngClass]="{'is-invalid': submitted && f['tb_Name'].errors }"
+                class="form-control" type="text">
+                <div *ngIf="submitted && f['tb_Name'].errors" class="invalid-feedback">
+                  <div *ngIf="f['tb_Name'].errors['required']">
+                    Il faut saisir le nom du portail vocal.
+                  </div>
+                </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4" style="padding-bottom:0;">
+          <div class="input-group-tous">
+            <span class="input-group-addon">
+                Prénom de l’ID d’appelant (*)
+            </span>
+            <div class="form-line">
+              <input formControlName="tb_LastName"  [ngClass]="{'is-invalid': submitted && f['tb_LastName'].errors }"
+                class="form-control" type="text">
+                <div *ngIf="submitted && f['tb_LastName'].errors" class="invalid-feedback">
+                  <div *ngIf="f['tb_LastName'].errors['required']">
+                    Il faut saisir le prénom de l’ID d’appelant.
+                  </div>
+                </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4" style="padding-bottom:0;">
+          <div class="input-group-tous">
+            <span class="input-group-addon">
+                Nom de l’ID d’appelant (*)
+            </span>
+            <div class="form-line">
+              <input formControlName="tb_FirstName"  [ngClass]="{'is-invalid': submitted && f['tb_FirstName'].errors }" class="form-control" type="text">
+              <div *ngIf="submitted && f['tb_FirstName'].errors" class="invalid-feedback">
+                <div *ngIf="f['tb_FirstName'].errors['required']">
+                  Il faut saisir le nom de l’ID d’appelant.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row g-3 infoIp">
+        <span><b>Appel entrant</b></span>
+        <div class="col-md-5" style="padding-bottom:0;">
+          <div class="input-group-tous">
+            <span class="input-group-addon">
+                Numéro de téléphone
+            </span>
+            <div class="form-line">
+                <ng-select 
+                formControlName="tb_PhoneNumber" [searchFn]="startsWithSearchFn" (change)="setExtensionOblige($event)">
+                <ng-option value="">Aucun</ng-option>
+                <ng-option *ngFor="let num of numbersPhone"
+                  [value]="num['phoneNumber']">{{num['phoneNumber']}}</ng-option>
+              </ng-select> 
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2" style="padding-bottom:0;">
+            <div class="input-group-tous">
+              <span class="input-group-addon">
+                 
+              </span>
+              <div class="form-line">
+                <span>et/ou</span>
+               
+              </div>
+            
+            </div>
+          </div>
+        <div class="col-md-5" style="padding-bottom:0;">
+          <div class="input-group-tous">
+            <span class="input-group-addon">
+               Extension <span *ngIf="obligatoireExtension">(*)</span>
+            </span>
+            <div class="form-line">
+              <input formControlName="tb_extension" [ngClass]="{'is-invalid': submitted && f['tb_extension'].errors }"
+                class="form-control" type="text" (keypress)="passcodeControl($event)" placeholder="Saisissez un numéro de deux à six chiffres">
+                <div *ngIf="submitted && f['tb_extension'].errors" class="invalid-feedback">
+                  <div *ngIf="f['tb_extension'].errors['minlength']">La longueur ne peut pas être inférieure à 2
+                  </div>
+                  <div *ngIf="f['tb_extension'].errors['maxlength']">La longueur ne peut pas être supérieure à 6
+                  </div>
+                  <div *ngIf="f['tb_extension'].errors['pattern']">Doit saisir des chiffres
+                  </div>
+                  <div *ngIf="f['tb_extension'].errors['required']">
+                    Il faut saisir l'extension car le champ <b>numéro de téléphone</b>  est vide
+                  </div>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+      <div class="row g-3 infoIp">
+        <span><b>Code d’accès à l’administration du portail vocal</b></span>
+        <div class="col-md-6" style="padding-bottom:0;">
+          <div class="input-group-tous">
+            <span class="input-group-addon">
+                Nouveau code d’accès
+            </span>
+            <div class="form-line">
+              <input formControlName="tb_newPasscode"  (keypress)="passcodeControl($event)"
+                class="form-control" type="text">
+            </div>
+          </div>
+
+        </div>
+        <div class="col-md-6" style="padding-bottom:0;">
+          <div class="input-group-tous">
+            <span class="input-group-addon">
+                Confirmer le nouveau code d’accès
+            </span>
+            <div class="form-line">
+              <input [ngClass]="{'is-invalid': submitted && f['tb_confirmPasscode'].errors }" formControlName="tb_confirmPasscode"
+                class="form-control" type="text" (keypress)="passcodeControl($event)">
+                
+                <div *ngIf="f['tb_confirmPasscode'].errors?.['confirmedValidator']" class="invalid-feedback">
+                  Les codes d’accès ne correspondent pas
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12">
+      <div class="row">
+        <div class="col-md-12">
+          <button style="margin-right: 15px;" class="btn btn-primary btn-xl">Enregistrer</button>
+          <button type="reset" class="btn btn-danger btn-xl" style="margin-right: 15px;">Annuler</button>
+        </div>
+      </div>
+    </div>
+  </form>

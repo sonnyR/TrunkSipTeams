@@ -1,0 +1,260 @@
+
+<div class="modal-header">
+    <h5 class="modal-title">Call forwarding</h5>
+    <button type="button" (click)="close()" class="close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="configureCallForwardingForm" *ngIf="configureCallForwardingForm" (ngSubmit)="configureCallForwarding()">
+    <div class="row infoIp" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+        <div class="col-md-6" style="padding-bottom:0;">
+          <div class="input-group-tous">
+            <div class="form-line">
+                <div class="form-check">
+                    <label style="cursor: pointer;" class="form-check-label" for="always">
+                    <input style="cursor: pointer;" class="form-check-input" type="checkbox" formControlName="tb_setEnabledAlways" value="" (change)="checkAlways($event)" id="always">
+                 
+                        Toujours
+                    </label>
+                </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6" style="padding-bottom:0;" *ngIf="always">
+          <div class="input-group-tous">
+            <div class="form-line">
+             
+              <ng-select formControlName="tb_setPhoneAlways" [searchFn]="startsWithSearchFn">
+                <ng-option *ngFor="let num of numbersPhone"
+                  [value]="num['phoneNumber'] != null ? num['phoneNumber'] : num['extension']">{{num['owner']['firstName']}}
+                  {{num['owner']['lastName']}} ({{num['phoneNumber']}}<span
+                    *ngIf="num['phoneNumber'] != null">,</span> Ext {{num['extension']}})
+                </ng-option>
+              </ng-select>
+              <div *ngIf="submitted && f['tb_setPhoneAlways'].errors" class="invalid-feedback">
+                <div *ngIf="f['tb_setPhoneAlways'].errors['required']">
+                Ce champ est obligatoire.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row infoIp" style="width: 100%; margin: 15px 0 15px 0; padding: 0; " *ngIf="always">
+        <div class="col-md-6" style="padding-bottom:0;">
+          <div class="input-group-tous">
+           
+          </div>
+        </div>
+        <div class="col-md-6" style="padding-bottom:0;">
+          <div class="input-group-tous">
+           
+            <div class="form-line">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="sendAlays" formControlName="tb_sendVioceMailAlways">
+                    <label class="form-check-label" for="sendAlays">
+                        Envoyer à la messagerie vocale
+                    </label>
+                </div>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row infoIp" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+        <div class="col-md-6" style="padding-bottom:0;">
+          <div class="input-group-tous">
+            <div class="form-line">
+                <div class="form-check">
+                    <input style="cursor: pointer;" class="form-check-input" type="checkbox" formControlName="tb_setEnabledBusy"  (change)="checkBusy($event)" id="busy" *ngIf="always" disabled>
+                    <input style="cursor: pointer;" class="form-check-input" type="checkbox" formControlName="tb_setEnabledBusy"  (change)="checkBusy($event)" id="busy" *ngIf="!always">
+                    <label style="cursor: pointer;" class="form-check-label" for="busy">
+                        Quand occupé
+                    </label>
+                </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6" style="padding-bottom:0;" *ngIf="busy">
+          <div class="input-group-tous">
+            <div class="form-line">
+                <ng-select formControlName="tb_setPhoneBusy" [searchFn]="startsWithSearchFn">
+                  <ng-option *ngFor="let num of numbersPhone"
+                    [value]="num['phoneNumber'] != null ? num['phoneNumber'] : num['extension']">{{num['owner']['firstName']}}
+                    {{num['owner']['lastName']}} ({{num['phoneNumber']}}<span
+                      *ngIf="num['phoneNumber'] != null">,</span> Ext {{num['extension']}})
+                  </ng-option>
+                </ng-select>
+                <div *ngIf="submitted && f['tb_setPhoneBusy'].errors" class="invalid-feedback">
+                  <div *ngIf="f['tb_setPhoneBusy'].errors['required']">
+                   Ce champ est obligatoire.
+                  </div>
+                </div> 
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row infoIp" style="width: 100%; margin: 15px 0 15px 0; padding: 0; " *ngIf="busy">
+        <div class="col-md-6" style="padding-bottom:0;">
+          <div class="input-group-tous">
+          </div>
+        </div>
+        <div class="col-md-6" style="padding-bottom:0;">
+          <div class="input-group-tous">
+            <div class="form-line">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="sendBusy" formControlName="tb_sendVioceMailBusy">
+                    <label class="form-check-label" for="sendBusy">
+                        Envoyer à la messagerie vocale
+                    </label>
+                </div>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row infoIp" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+        <div class="col-md-6" style="padding-bottom:0;">
+          <div class="input-group-tous">
+            <div class="form-line">
+                <div class="form-check">
+                    <input style="cursor: pointer;" class="form-check-input" type="checkbox" formControlName="tb_setEnabledNoAnswer"  (change)="checkNoAnswer($event)" id="noAnswer" *ngIf="always" disabled>
+                    <input style="cursor: pointer;" class="form-check-input" type="checkbox" formControlName="tb_setEnabledNoAnswer"  (change)="checkNoAnswer($event)" id="noAnswer" *ngIf="!always">
+                    <label style="cursor: pointer;" class="form-check-label" for="noAnswer">
+                        Quand pas de réponse
+
+                    </label>
+                </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6" style="padding-bottom:0;" *ngIf="noAnswer">
+          <div class="input-group-tous">
+            <div class="form-line">
+                <ng-select formControlName="tb_setPhoneNoAnswer" [searchFn]="startsWithSearchFn">
+                  <ng-option *ngFor="let num of numbersPhone"
+                    [value]="num['phoneNumber'] != null ? num['phoneNumber'] : num['extension']">{{num['owner']['firstName']}}
+                    {{num['owner']['lastName']}} ({{num['phoneNumber']}}<span
+                      *ngIf="num['phoneNumber'] != null">,</span> Ext {{num['extension']}})
+                  </ng-option>
+                </ng-select>
+                <div *ngIf="submitted && f['tb_setPhoneNoAnswer'].errors" class="invalid-feedback">
+                  <div *ngIf="f['tb_setPhoneNoAnswer'].errors['required']">
+                   Ce champ est obligatoire.
+                  </div>
+                </div> 
+               
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row infoIp" style="width: 100%; margin: 15px 0 15px 0; padding: 0; "  *ngIf="noAnswer">
+        <div class="col-md-6" style="padding-bottom:0;">
+          <div class="input-group-tous">
+          </div>
+        </div>
+        <div class="col-md-6" style="padding-bottom:0;">
+          <div class="input-group-tous">
+            <div class="form-line">
+                <div class="form-check">
+                    <input style="cursor: pointer;" class="form-check-input" type="checkbox" value="" id="sendPasRes" formControlName="tb_sendVioceMailNoAnswer">
+                    <label style="cursor: pointer;" class="form-check-label" for="sendPasRes">
+                        Envoyer à la messagerie vocale
+                    </label>
+                </div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+      <div class="row infoIp" style="width: 100%; margin: 15px 0 15px 0; padding: 0; " *ngIf="noAnswer">
+        <div class="col-md-6" style="padding-bottom:0;">
+          <div class="input-group-tous">
+            <div class="form-line">
+                <div class="form-check">
+                    
+                    <label class="form-check-label" for="flexCheckDefault">
+                        Number of rings before forwarding
+                    </label>
+                </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2" style="padding-bottom:0;">
+          <div class="input-group-tous">
+         
+            <div class="form-line">
+                <ng-select formControlName="tb_numberOfRingsNoAnswer">
+                <ng-option *ngFor="let ring of numberOfRing"   [value]="ring">{{ring}}</ng-option>
+                
+              </ng-select>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row infoIp" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+        <div class="col-md-6" style="padding-bottom:0;">
+          <div class="input-group-tous">
+            <div class="form-line">
+                <div class="form-check">
+                    <input style="cursor: pointer;" class="form-check-input" type="checkbox" formControlName="tb_setEnabledNotReachable" (change)="checkNotReatchable($event)" id="notReachable">
+                    <label style="cursor: pointer;" class="form-check-label" for="notReachable">
+                        Lorsqu'il n'est pas joignable (Business Continuity)
+                    </label>
+                </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6" style="padding-bottom:0;" *ngIf="notReatchable">
+          <div class="input-group-tous">
+            <div class="form-line">
+                <ng-select formControlName="tb_setPhoneNotReachable" [searchFn]="startsWithSearchFn">
+                  <ng-option *ngFor="let num of numbersPhone"
+                    [value]="num['phoneNumber'] != null ? num['phoneNumber'] : num['extension']">{{num['owner']['firstName']}}
+                    {{num['owner']['lastName']}} ({{num['phoneNumber']}}<span
+                      *ngIf="num['phoneNumber'] != null">,</span> Ext {{num['extension']}})
+                  </ng-option>
+                </ng-select>
+                <div *ngIf="submitted && f['tb_setPhoneNotReachable'].errors" class="invalid-feedback">
+                  <div *ngIf="f['tb_setPhoneNotReachable'].errors['required']">
+                    Numéro de téléphone ou extension non valide.
+                  </div>
+                </div> 
+               
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row infoIp" style="width: 100%; margin: 15px 0 15px 0; padding: 0; " *ngIf="notReatchable">
+        <div class="col-md-6" style="padding-bottom:0;">
+          <div class="input-group-tous">
+          </div>
+        </div>
+        <div class="col-md-6" style="padding-bottom:0;">
+          <div class="input-group-tous">
+            <div class="form-line">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="sendRechable" formControlName="tb_sendVioceMailNotReachable">
+                    <label class="form-check-label" for="sendRechable">
+                        Envoyer à la messagerie vocale
+                    </label>
+                </div>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12" style="text-align: end;">
+        <div class="row">
+          <div class="col-md-12">
+            <button type="reset" class="btn btn-danger btn-xl" style="margin-right: 15px;"
+              (click)="close()">Annuler</button>
+            <button type="submit" style="margin-right: 15px;" class="btn btn-primary btn-xl">Enrégistrer</button>
+          </div>
+        </div>
+      </div>
+    </form>
+
+

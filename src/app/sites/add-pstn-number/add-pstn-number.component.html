@@ -1,0 +1,113 @@
+<app-loader *ngIf="loading" [TextValue]="TextValue"></app-loader>
+<div class="modal-header">
+  <h5 class="modal-title">Gestion des lignes</h5>
+  <button type="button" (click)="close()" class="close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <form [formGroup]="registerPstnNumberForm" (ngSubmit)="onSubmit()">
+    <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+      <div class="col-lg-12">
+        <span class="input-group-addon">
+          Sites (*)
+        </span>
+        <div class="form-line">
+          <ng-select name="Site" [ngClass]="{'is-invalid': submitted && f['tb_Site'].errors }" formControlName="tb_Site" [loading]=loadingSite loadingText='Chargement...'
+            required>
+            <ng-option *ngFor="let site of Sites" [value]="site['id']">{{site['name']}}</ng-option>
+          </ng-select>
+          <div *ngIf="submitted && f['tb_Site'].errors" class="invalid-feedback">
+            <div *ngIf="f['tb_Site'].errors['required']">
+              Il faut saisir un site.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; ">
+      <div class="col-lg-12">
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" (click)="AddTypeLigne('Separe')" checked>
+      <label class="form-check-label" for="flexRadioDefault1">
+        Ajouter des lignes séparées
+      </label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" (click)="AddTypeLigne('Tranche')">
+      <label class="form-check-label" for="flexRadioDefault2">
+        Ajouter de tranches des lignes
+      </label>
+    </div>
+  </div>
+  </div>
+    <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; " *ngIf="separe">
+      <div class="col-lg-12">
+        <span class="input-group-addon">
+          Numéro (*)
+        </span>
+        <div class="form-line">
+          <input type="text" [ngClass]="{'is-invalid': submitted && f['tb_pstnNumber'].errors }"
+           formControlName="tb_pstnNumber" id="PhoneNumber" class="form-control"
+           (keyup)="numberControlSepare($event,f['tb_pstnNumber'])" (keypress)="numberControlSepare($event,f['tb_pstnNumber'])"
+            placeholder="Saisissez les numéros de téléphone séparés par des virgules" id="numberPhone">
+          <div *ngIf="submitted && f['tb_pstnNumber'].errors" class="invalid-feedback">
+            <div *ngIf="f['tb_pstnNumber'].errors['required']">
+              Il faut saisir au moins un numéro du téléphone.
+            </div>
+          </div>
+          <div *ngIf="!validNumber">
+            <span style="color: red;">Le numéro de téléphone doit commencer par +33 et doit comporter 12 caractères</span>
+      
+        </div>
+        </div>
+      </div>
+    </div>
+    <div class="row Info" style="width: 100%; margin: 15px 0 15px 0; padding: 0; " *ngIf="tranche">
+      <span class="input-group-addon">
+      Tranches de numéros (*)
+    </span>
+      <div class="col-lg-6">
+        <div class="form-line">
+          <input type="text" [ngClass]="{'is-invalid': submitted && f['firstNum'].errors }"
+          (keypress)="numberControlFirst($event,f['firstNum'])"  (keyup)="numberControlFirst($event,f['firstNum'])" formControlName="firstNum"  class="form-control" id="firstNumberPhone"
+            placeholder="Premier numéro de téléphone">
+          <div *ngIf="submitted && f['firstNum'].errors" class="invalid-feedback">
+            <div *ngIf="f['firstNum'].errors['required']">
+              Il faut saisir Le premier numéro de téléphone.
+            </div>
+          </div>
+          <div *ngIf="!validNumberFirst">
+            <span style="color: red;">Le numéro de téléphone doit commencer par +33 et doit comporter 12 caractères</span>
+      
+        </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="form-line">
+          <input type="text" [ngClass]="{'is-invalid': submitted && f['lastNum'].errors }"
+          (keypress)="numberControlLast($event,f['lastNum'])" (keyup)="numberControlLast($event,f['lastNum'])" formControlName="lastNum" class="form-control" id="lastNumberPhone"
+            placeholder="Dernier numéro de téléphone">
+          <div *ngIf="submitted && f['lastNum'].errors" class="invalid-feedback">
+            <div *ngIf="f['lastNum'].errors['required']">
+              Il faut saisir Le dernier numéro de téléphone.
+            </div>
+          </div>
+          <div *ngIf="!validNumberLast">
+            <span style="color: red;">Le numéro de téléphone doit commencer par +33 et doit comporter 12 caractères</span>
+      
+        </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12" style="text-align: end;">
+      <div class="row">
+        <div class="col-md-12">
+          <button type="reset" style="margin-right: 15px;" class="btn btn-danger btn-xl" (click)="close()">Annuler</button>
+          <button style="margin-right: 15px;" class="btn btn-primary btn-xl">Ajouter</button>
+        </div>
+      </div>
+
+    </div>
+  </form>
+</div>
