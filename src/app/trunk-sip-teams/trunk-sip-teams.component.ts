@@ -565,7 +565,6 @@ SaveDomain() {
                   this.showVerifDomain = true;
                   this.labelDomain = "Vérifier Domaine"
                   this.loading = false;
-
                   this.getDomainsClient();
               }
           },
@@ -804,7 +803,7 @@ GetTrunkSipTeamsById(id) {
           if (this.currentTrunkSipTeamsNDI) {
             this.ajoutTrunkSipTeamsForm.get('ndiControl').setValue(this.currentTrunkSipTeamsNDI.number);
             this.ajoutTrunkSipTeamsForm.get('ndivalue').setValue(this.currentTrunkSipTeamsNDI.number);
-            console.log( ' SDiValue ==',this.ajoutTrunkSipTeamsForm.get('ndivalue').value)
+
           }
 
           if (data.listLigneNDISDA && data.listLigneNDISDA.lstSDA && data.listLigneNDISDA.lstSDA.length > 0) {
@@ -814,9 +813,9 @@ GetTrunkSipTeamsById(id) {
               const firstSDA = this.sDAHistories[0];
               const lastSDA = this.sDAHistories[this.sDAHistories.length - 1];
               this.ajoutTrunkSipTeamsForm.get('sdavalue').setValue(`${firstSDA.tete_NUMBER}-${lastSDA.tete_NUMBER}`);
+              this.ajoutTrunkSipTeamsForm.get('sdaControl').setValue(`${firstSDA.tete_NUMBER}-${lastSDA.tete_NUMBER}`);
             } else {
               this.ajoutTrunkSipTeamsForm.get('sdavalue').setValue(data.listLigneNDISDA.lstSDA[0].tete_NUMBER);
-              console.log( ' SDA Value ==',this.ajoutTrunkSipTeamsForm.get('sdavalue').value)
               this.ajoutTrunkSipTeamsForm.get('sdaControl').setValue(data.listLigneNDISDA.lstSDA[0].tete_NUMBER);
             }
 
