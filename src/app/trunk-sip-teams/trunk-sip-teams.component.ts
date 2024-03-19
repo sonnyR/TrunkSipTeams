@@ -205,7 +205,7 @@ export class TrunkSipTeamsComponent implements OnInit {
     this.IsEditMode = false;
     this.SendCrmCommandeTrunkSip = false;
     this.isTabAddTeamsDisabled = true;
-
+console.log( '  this.dataSourceSDA    =   ', this.dataSourceSDA )
    if (loadData)
       this.GetListTrunkSipTeamsByCodeClient(this.codeclient);
   }
@@ -285,9 +285,6 @@ export class TrunkSipTeamsComponent implements OnInit {
 
   }
 
-
-
-
   AddNewTeamsTrunkSip() {
 
     this.maxValue = false;
@@ -338,7 +335,6 @@ export class TrunkSipTeamsComponent implements OnInit {
 
   }
 
-
   goToTab1() {
 
     this.selectedIndex = 1;
@@ -346,7 +342,6 @@ export class TrunkSipTeamsComponent implements OnInit {
      this.getDomainsClient()
 
   }
-
 
   CreateFormAjoutTrunk() {
     if (this.codeclient != undefined || this.codeclient != null) {
@@ -381,7 +376,6 @@ export class TrunkSipTeamsComponent implements OnInit {
     }
 }
 
-
 createAjoutTrunkForm() {
   this.subDomain = this.DomainComplet;
   this.ajoutTrunkSipTeamsForm = this.formBuilder.group({
@@ -399,13 +393,11 @@ createAjoutTrunkForm() {
 }
 
 
-
 onNDISelectionChange(event: MatAutocompleteSelectedEvent): void {
   const selectedNDI = event.option.value;
   this.ajoutTrunkSipTeamsForm.get('ndiControl').setValue(selectedNDI.number);
   this.ajoutTrunkSipTeamsForm.get('ndivalue').setValue(selectedNDI.number);
 }
-
 
 onSDASelectionChange(event: MatAutocompleteSelectedEvent) {
   const selectedSDA = event.option.value;
@@ -414,8 +406,6 @@ onSDASelectionChange(event: MatAutocompleteSelectedEvent) {
   this.ajoutTrunkSipTeamsForm.get('sdavalue').setValue(selectedSDANumber);
   this.currentTrunkSipTeamsSDA = selectedSDA;
 }
-
-
 
   CreateFormAjoutDomain() {
 
@@ -431,7 +421,6 @@ onSDASelectionChange(event: MatAutocompleteSelectedEvent) {
       ttl: new FormControl('')
     });
   }
-
 
   getDomainsClient() {
 
@@ -740,6 +729,9 @@ SaveDomain() {
   }
 
 
+
+
+
   SetModeEdit() {
 
     this.f['ndiControl'].enable();
@@ -845,42 +837,6 @@ GetTrunkSipTeamsById(id) {
     );
 }
 
-
-  GetSDAHistory(trunkSipProfilId) {
-    this.loading = true;
-    let url = `${environment.TeamsApiUrl}/TrunkSipTeamsApi/GetSDAHistory?trunksipId=` + trunkSipProfilId ;
-
-    this.dataService.get(url)
-      .subscribe(
-        data => {
-          if (data && data.length > 0) {
-            this.sDAHistories = data;
-            this.sDAHistories.forEach((currentValue, index) => {
-              currentValue.index = index;
-            });
-          } else {
-            this.sDAHistories = [];
-          }
-          if (this.currentTrunkSipTeamsSDA && this.currentTrunkSipTeamsSDA.tete_NUMBER) {
-            const newSDA = new COMMANDEPF_SDA();
-            newSDA.tete_NUMBER = this.currentTrunkSipTeamsSDA.tete_NUMBER;
-            newSDA.id = this.currentTrunkSipTeamsSDA.id;
-            if (!this.sDAHistories) {
-              this.sDAHistories = [];
-            }
-            newSDA.index = this.sDAHistories.length + 1;
-            this.sDAHistories.push(newSDA);
-            this.dataSourceSDA = new MatTableDataSource(this.sDAHistories);
-            this.dataSourceSDA.sort = this.sortSDA;
-          } else {
-            console.error("this.currentTrunkSipTeamsSDA is undefined or its property 'tete_NUMBER' is null.");
-          }
-        },
-        errorResponse => {
-          this.loading = false;
-          this.notifyService.error(errorResponse.message);
-        });
-  }
 
   DeleteTrunkSipTeamsClick(id,codeClient) {
     this.confirmationDialogService.confirm('Confirmation', 'Êtes-vous sûr de bien vouloir résillier ce trunk sip? Vous allez libérer toutes les lignes fixe commandées par ce client ' + codeClient, "Valider", "Annuler", "md")
