@@ -356,7 +356,7 @@
                     <div class="col-lg-12">
                         <b>NDI :</b>
 
-                        <input class="form-control" type="text" formControlName="ndivalue" >  <!-- [(ngModel)]="currentTrunkSipTeamsNDI"  -->
+                        <input class="form-control" type="text" formControlName="ndivalue"  >  <!-- [(ngModel)]="currentTrunkSipTeamsNDI"  -->
                         <mat-error *ngIf="ajoutTrunkSipTeamsForm.get('ndivalue').errors?.required && (ajoutTrunkSipTeamsForm.get('ndivalue').pristine || !submitted)">NDI est obligatoire !</mat-error>
 
                       </div>
@@ -367,7 +367,7 @@
                 <div class="row" style="margin-top:10px;">
                     <div class="col-lg-8">
                         <mat-form-field class="full-width">
-                            <input type="text" matInput formControlName="ndiControl" [matAutocomplete]="autoNDI">
+                            <input type="text" [(ngModel)]="currentTrunkSipTeamsNDI"  matInput formControlName="ndiControl" [matAutocomplete]="autoNDI">
                             <mat-autocomplete #autoNDI="matAutocomplete" [displayWith]="displayNDI" (optionSelected)="onNDISelectionChange($event)">
                                 <mat-option *ngFor="let ndi of filteredNDIs | async" [value]="ndi">{{ndi.number}}</mat-option>
                             </mat-autocomplete>

@@ -39,8 +39,6 @@ export class TrunkSipTeamsComponent implements OnInit {
   }
   submittedVerifDomain = false
   infoClientsSDAs: FormArray;
-  // filteredClients: Observable<ClientDto[]>;
-  // public _clients: ClientDto[];
   FilterForm: FormGroup;
   DomainForm: FormGroup
   VerifDomainForm: FormGroup;
@@ -64,9 +62,6 @@ export class TrunkSipTeamsComponent implements OnInit {
   labelDomain = "Ajout Domaine"
   DomainCreated : DomainOVHDto
 
-  // get Clients(): ClientDto[] {
-  //   return this._clients;
-  // }
   public trunkSipTeamssDTOListTemp: TrunkSipTeamsDto[];
   public _trunkSipTeamsDTOList: TrunkSipTeamsDto[];
   get TrunkSipTeamsDTOList(): TrunkSipTeamsDto[] {
@@ -205,7 +200,7 @@ export class TrunkSipTeamsComponent implements OnInit {
     this.IsEditMode = false;
     this.SendCrmCommandeTrunkSip = false;
     this.isTabAddTeamsDisabled = true;
-console.log( '  this.dataSourceSDA    =   ', this.dataSourceSDA )
+    console.log( '  this.dataSourceSDA    =   ', this.dataSourceSDA )
    if (loadData)
       this.GetListTrunkSipTeamsByCodeClient(this.codeclient);
   }
@@ -286,7 +281,7 @@ console.log( '  this.dataSourceSDA    =   ', this.dataSourceSDA )
   }
 
   AddNewTeamsTrunkSip() {
-
+    this.DeleteSDAs();
     this.maxValue = false;
     this.SetModeEdit();
     this.isTabAddTeamsDisabled = false;
@@ -395,8 +390,11 @@ createAjoutTrunkForm() {
 
 onNDISelectionChange(event: MatAutocompleteSelectedEvent): void {
   const selectedNDI = event.option.value;
-  this.ajoutTrunkSipTeamsForm.get('ndiControl').setValue(selectedNDI.number);
-  this.ajoutTrunkSipTeamsForm.get('ndivalue').setValue(selectedNDI.number);
+  const selectedSDANumber = selectedNDI.number;
+  this.ajoutTrunkSipTeamsForm.get('ndiControl').setValue(selectedSDANumber);
+  this.ajoutTrunkSipTeamsForm.get('ndivalue').setValue(selectedSDANumber);
+  this.currentTrunkSipTeamsNDI = selectedNDI;
+
 }
 
 onSDASelectionChange(event: MatAutocompleteSelectedEvent) {
@@ -681,6 +679,16 @@ SaveDomain() {
     this.LoadSDAs();
   }
 
+
+  DeleteSDAs() {
+
+    this.sDAHistories = [];
+    this.dataSourceSDA = new MatTableDataSource<COMMANDEPF_SDA>(this.sDAHistories);
+    this.dataSourceSDA.sort = this.sortSDA;
+    this.LoadSDAs();
+}
+
+
   saveTrunkSipTeams() {
 
     this.submitted = true;
@@ -718,6 +726,7 @@ SaveDomain() {
           this.loading = false;
           console.log(data, 'Trunk Sip teams a été enregistré avec succès');
           this.notifyService.success("Trunk Sip teams a été enregistré avec succès");
+          this.DeleteSDAs();
           this.goToTab0(true);
         },
         (errorResponse: any) => {
@@ -769,6 +778,7 @@ SaveDomain() {
 
 GetTrunkSipTeamsById(id) {
   let url = `${environment.TeamsApiUrl}/TrunkSipTeamsApi/GetTrunkSipTeamsById?profilId=` + id;
+  console.log( id )
   this.dataService.get(url)
     .subscribe(
       data => {
@@ -777,16 +787,36 @@ GetTrunkSipTeamsById(id) {
           this.IsEditMode = true;
           this.currentTrunkSipTeams = data;
           this.LoadOffreTrunkSip();
-          console.log(this.currentTrunkSipTeams);
+          this.getDomainsClient();
+          this.GetClientLignesNDISDA();
+          this.subDomain = this.currentTrunkSipTeams.sipDomaine;
+          this.selectedSipDomaine = this.currentTrunkSipTeams.sipDomaine;
+
+          if (data.listLigneNDISDA && data.listLigneNDISDA.lstNDI && data.listLigneNDISDA.lstNDI.length > 0) {
+            const firstNDI = data.listLigneNDISDA.lstNDI[0];
+            this.currentTrunkSipTeamsNDI = {
+              id: firstNDI.id,
+              prefixe: firstNDI.prefixe,
+              number: firstNDI.number,
+            };
+
+          }
+          if (this.currentTrunkSipTeamsNDI) {
+            this.ajoutTrunkSipTeamsForm.get('ndiControl').setValue(this.currentTrunkSipTeamsNDI.number);
+            this.ajoutTrunkSipTeamsForm.get('ndivalue').setValue(this.currentTrunkSipTeamsNDI.number);
+            console.log( ' SDiValue ==',this.ajoutTrunkSipTeamsForm.get('ndivalue').value)
+          }
 
           if (data.listLigneNDISDA && data.listLigneNDISDA.lstSDA && data.listLigneNDISDA.lstSDA.length > 0) {
             this.sDAHistories = data.listLigneNDISDA.lstSDA;
+
             if (this.sDAHistories.length > 1) {
               const firstSDA = this.sDAHistories[0];
               const lastSDA = this.sDAHistories[this.sDAHistories.length - 1];
               this.ajoutTrunkSipTeamsForm.get('sdavalue').setValue(`${firstSDA.tete_NUMBER}-${lastSDA.tete_NUMBER}`);
             } else {
               this.ajoutTrunkSipTeamsForm.get('sdavalue').setValue(data.listLigneNDISDA.lstSDA[0].tete_NUMBER);
+              console.log( ' SDA Value ==',this.ajoutTrunkSipTeamsForm.get('sdavalue').value)
               this.ajoutTrunkSipTeamsForm.get('sdaControl').setValue(data.listLigneNDISDA.lstSDA[0].tete_NUMBER);
             }
 
@@ -800,25 +830,8 @@ GetTrunkSipTeamsById(id) {
             this.sDAHistories = [];
           }
 
-          if (data.listLigneNDISDA && data.listLigneNDISDA.lstNDI && data.listLigneNDISDA.lstNDI.length > 0) {
-            const firstNDI = data.listLigneNDISDA.lstNDI[0];
-            this.currentTrunkSipTeamsNDI = {
-              id: firstNDI.id,
-              prefixe: firstNDI.prefixe,
-              number: firstNDI.number,
-            };
 
-          }
 
-          if (this.currentTrunkSipTeamsNDI) {
-            this.ajoutTrunkSipTeamsForm.get('ndiControl').setValue(this.currentTrunkSipTeamsNDI.number);
-            this.ajoutTrunkSipTeamsForm.get('ndivalue').setValue(this.currentTrunkSipTeamsNDI.number);
-          }
-
-          this.getDomainsClient();
-          this.GetClientLignesNDISDA();
-          this.subDomain = this.currentTrunkSipTeams.sipDomaine;
-          this.selectedSipDomaine = this.currentTrunkSipTeams.sipDomaine;
 
           this.isEdit = true;
           this.titre = "Editer Trunk SIP Teams";
